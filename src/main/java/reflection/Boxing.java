@@ -1,9 +1,13 @@
 package reflection;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Boxing {
+    public static Class[] classes = {Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Character.class, Boolean.class};
+    public static Class[] primitives = {byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class};
+
     public static Object box(Object o) {
         return o;
     }
@@ -44,8 +48,11 @@ public class Boxing {
         return o;
     }
 
+    public static boolean isWrapper(Class clazz) {
+        return Arrays.stream(classes).toList().contains(clazz);
+    }
+
     public static Class getWrapperType(Object o) {
-        Class[] classes = {Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Character.class, Boolean.class};
 
         for(Class c : classes) {
             if(o.getClass() == c) {
@@ -56,8 +63,6 @@ public class Boxing {
     }
 
     public static Class getPrimitiveType(Object o) {
-        Class[] classes = {Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Character.class, Boolean.class};
-        Class[] primitives = {byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class};
 
         for(int i = 0;i < 8; i++) {
             if(o.getClass() == classes[i]) {
@@ -68,8 +73,6 @@ public class Boxing {
     }
 
     public static Class wrapperToPrimitive(Class clazz) {
-        Class[] classes = {Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Character.class, Boolean.class};
-        Class[] primitives = {byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class};
 
         for(int i = 0;i < 8; i++) {
             if(clazz == classes[i]) {
@@ -80,8 +83,6 @@ public class Boxing {
     }
 
     public static Class PrimitiveToWrapper(Class clazz) {
-        Class[] classes = {Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Character.class, Boolean.class};
-        Class[] primitives = {byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class};
 
         for(int i = 0;i < 8; i++) {
             if(clazz == primitives[i]) {
