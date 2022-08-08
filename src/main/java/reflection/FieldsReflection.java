@@ -36,7 +36,7 @@ public class FieldsReflection {
                 } else if(f.getType() == boolean.class) {
                     unsafe.putBoolean(staticFieldBase, staticFieldOffset, (Boolean) value);
                 } else {
-                    unsafe.putObject(unsafe.staticFieldBase(f), unsafe.staticFieldOffset(f), value);
+                    unsafe.putObject(staticFieldBase, staticFieldOffset, value);
                 }
 
             } else {
