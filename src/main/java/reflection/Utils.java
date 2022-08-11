@@ -89,17 +89,29 @@ public class Utils {
     /**
      * change modifiers of object
      * @param o object to change modifiers of
-     * @param modifier modifier to change to
+     * @param modifierList modifiers to change to
      * @return object with changed modifiers
      */
-    public static Object changeModifiers(Object o, int modifier) {
-        Field f = getField(o.getClass(), "modifiers");
-        forceAccessible(f);
-        Method m = getMethod("getModifiers", o.getClass());
-        forceAccessible(m);
-        int modifiers = unbox((Integer) useMethod(m, o));
+    public static Object changeModifiers(Object o, int ... modifierList) {
+        try {
+            if(modifierList.length == 0) {
+                return null;
+            }
+            Field f = getField(o.getClass(), "modifiers");
+            forceAccessible(f);
+            Method m = getMethod("getModifiers", o.getClass());
+            forceAccessible(m);
+            int modifiers = unbox((Integer) useMethod(m, o));
 
-        forceSet(f, modifiers & modifier, false, o);
-        return o;
+            for(int modifier : modifierList) {
+                f.setInt(o, modifiers + modifier);
+                m = getMethod("getModifiers", o.getClass());
+                modifiers = unbox((Integer) useMethod(m, o));
+            }
+            return o;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
