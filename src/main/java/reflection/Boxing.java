@@ -71,30 +71,29 @@ public class Boxing {
         return null;
     }
 
-    public static Class wrapperToPrimitive(Class clazz) {
+    public static Class wrapperToPrimitive(Object o) {
 
         for(int i = 0;i < 8; i++) {
-            if(clazz == classes[i]) {
+            if(o.getClass() == classes[i]) {
                 return primitives[i];
             }
         }
         return null;
     }
 
-    public static Class PrimitiveToWrapper(Class clazz) {
+    public static Class PrimitiveToWrapper(Object o) {
 
-        for(int i = 0;i < 8; i++) {
-            if(clazz == primitives[i]) {
-                return classes[i];
-            }
+        if(isWrapper(o.getClass())) {
+            return o.getClass();
         }
         return null;
     }
 
     public static Constructor getWrappersConstructors(Object o) {
         try {
-            if(isWrapper(o.getClass()))
-            return o.getClass().getConstructor(wrapperToPrimitive(o.getClass()));
+            if(isWrapper(o.getClass())) {
+                return o.getClass().getConstructor(wrapperToPrimitive(o));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

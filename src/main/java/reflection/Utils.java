@@ -16,10 +16,8 @@ public class Utils {
         try {
             Unsafe unsafe = getUnsafe();
             Field f = getField(AccessibleObject.class, "override");
-            Method m = AccessibleObject.class.getDeclaredMethod("setAccessible0", boolean.class);
 
-            unsafe.putBoolean(m, unsafe.objectFieldOffset(f), true);
-            m.invoke(o, true);
+            unsafe.putBoolean(o, unsafe.objectFieldOffset(f), true);
             return o;
         } catch (Exception e) {
             e.printStackTrace();
@@ -55,7 +53,7 @@ public class Utils {
             Object FieldBase = unsafe.staticFieldBase(f);
             long FieldOffset = unsafe.staticFieldOffset(f);
 
-            Method m = unsafeSet.get(wrapperToPrimitive(value.getClass()));
+            Method m = unsafeSet.get(wrapperToPrimitive(value));
             if (m != null) {
                 m.invoke(unsafe, FieldBase, FieldOffset, getWrappersConstructors(value).newInstance(value));
             } else {
