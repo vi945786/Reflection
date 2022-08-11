@@ -4,11 +4,13 @@ import sun.misc.Unsafe;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 import static java.util.Map.entry;
 import static reflection.Boxing.*;
 import static reflection.FieldsReflection.getField;
 import static reflection.MethodReflection.getMethod;
+import static reflection.MethodReflection.useMethod;
 
 public class Utils {
 
@@ -25,8 +27,8 @@ public class Utils {
             }
 
             Unsafe unsafe = getUnsafe();
-            Field f = getField(AccessibleObject.class, "override");
 
+            Field f = getField(AccessibleObject.class, "override");
             unsafe.putBoolean(o, unsafe.objectFieldOffset(f), true);
             return o;
         } catch (Exception e) {
@@ -82,5 +84,22 @@ public class Utils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * change modifiers of object
+     * @param o object to change modifiers of
+     * @param modifier modifier to change to
+     * @return object with changed modifiers
+     */
+    public static Object changeModifiers(Object o, int modifier) {
+        Field f = getField(o.getClass(), "modifiers");
+        forceAccessible(f);
+        Method m = getMethod("getModifiers", o.getClass());
+        forceAccessible(m);
+        int modifiers = unbox((Integer) useMethod(m, o));
+
+        forceSet(f, modifiers & modifier, false, o);
+        return o;
     }
 }
