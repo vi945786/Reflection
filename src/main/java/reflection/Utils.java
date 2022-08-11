@@ -55,27 +55,19 @@ public class Utils {
      * forcefully change a field's value
      * @param f the field to change
      * @param value the value the field is changing to
-     * @param isStatic is the instance static
      * @param instance the instance of the object the field is in
      */
-    public static void forceSet(Field f, Object value, boolean isStatic, Object instance) {
+    public static void forceSet(Field f, Object value, Object instance) {
         try {
             Unsafe unsafe = getUnsafe();
-            Map<Class, Method> unsafeSet = Map.ofEntries(
-                    entry(byte.class, (Method) forceAccessible(getMethod("putByte", Unsafe.class, Object.class, long.class, byte.class))),
-                    entry(short.class, (Method) forceAccessible(getMethod("putShort", Unsafe.class, Object.class, long.class, short.class))),
-                    entry(int.class, (Method) forceAccessible(getMethod("putInt", Unsafe.class, Object.class, long.class, int.class))),
-                    entry(long.class, (Method) forceAccessible(getMethod("putLong", Unsafe.class, Object.class, long.class, long.class))),
-                    entry(float.class, (Method) forceAccessible(getMethod("putFloat", Unsafe.class, Object.class, long.class, float.class))),
-                    entry(double.class, (Method) forceAccessible(getMethod("putDouble", Unsafe.class, Object.class, long.class, double.class))),
-                    entry(char.class, (Method) forceAccessible(getMethod("putChar", Unsafe.class, Object.class, long.class, char.class))),
-                    entry(boolean.class, (Method) forceAccessible(getMethod("putBoolean", Unsafe.class, Object.class, long.class, boolean.class)))
-            );
 
-            Object FieldBase = isStatic ? unsafe.staticFieldBase(f) : instance;
-            long FieldOffset = isStatic ? unsafe.staticFieldOffset(f) : unsafe.objectFieldOffset(f);
+            Object FieldBase = instance == null ? unsafe.staticFieldBase(f) : instance;
+            long FieldOffset = instance == null ? unsafe.staticFieldOffset(f) : unsafe.objectFieldOffset(f);
 
-            Method m = unsafeSet.get(wrapperToPrimitive(value.getClass()));
+            Class asPrimitive = wrapperToPrimitive(value.getClass());
+            String methodName = "put" + asPrimitive.getSimpleName().substring(0, 1).toUpperCase() + asPrimitive.getSimpleName().substring(1);
+            Method m = (Method) forceAccessible(getMethod(methodName, Unsafe.class, Object.class, long.class, asPrimitive));
+
             if (m != null) {
                 m.invoke(unsafe, FieldBase, FieldOffset, value);
             } else {

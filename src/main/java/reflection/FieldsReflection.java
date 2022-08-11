@@ -17,7 +17,7 @@ public class FieldsReflection {
             boolean isStatic = instance instanceof Class<?>;
 
             forceAccessible(f);
-            forceSet(f, value, isStatic, instance);
+            forceSet(f, value, instance instanceof Class<?> ? null : instance);
 
         } catch (Exception e) {
             e.printStackTrace();
