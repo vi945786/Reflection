@@ -16,6 +16,10 @@ public class FakeClass {
         privateFinalField = 1;
     }
 
+    private FakeClass(Integer i) {
+        privateFinalField = 1;
+    }
+
     public FakeClass(String s) {
         privateFinalField = 0;
     }
