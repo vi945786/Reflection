@@ -1,15 +1,56 @@
 package reflection;
 
-import java.util.ArrayList;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Boxing {
     public static Class[] classes = {Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Character.class, Boolean.class};
     public static Class[] primitives = {byte.class, short.class, int.class, long.class, float.class, double.class, char.class, boolean.class};
+    public static Map<Class, Method> unboxing = new HashMap<>();
+
+    static {
+        try {
+            Method m = Byte.class.getMethod("byteValue");
+            m.setAccessible(true);
+            unboxing.put(Byte.class, m);
+
+            m = Short.class.getMethod("shortValue");
+            m.setAccessible(true);
+            unboxing.put(Short.class, m);
+
+            m = Integer.class.getMethod("intValue");
+            m.setAccessible(true);
+            unboxing.put(Integer.class, m);
+
+            m = Long.class.getMethod("longValue");
+            m.setAccessible(true);
+            unboxing.put(Long.class, m);
+
+            m = Float.class.getMethod("floatValue");
+            m.setAccessible(true);
+            unboxing.put(Float.class, m);
+
+            m = Double.class.getMethod("doubleValue");
+            m.setAccessible(true);
+            unboxing.put(Double.class, m);
+
+            m = Character.class.getMethod("charValue");
+            m.setAccessible(true);
+            unboxing.put(Character.class, m);
+
+            m = Boolean.class.getMethod("booleanValue");
+            m.setAccessible(true);
+            unboxing.put(Boolean.class, m);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static Object box(Object o) {
-        return o;
+        return isWrapper(o.getClass()) ? o : null;
     }
 
     public static byte unbox(Byte o) {
@@ -42,10 +83,6 @@ public class Boxing {
 
     public static boolean unbox(Boolean o) {
         return o.booleanValue();
-    }
-
-    public static Object unbox(Object o) {
-        return o;
     }
 
     public static boolean isWrapper(Class clazz) {
