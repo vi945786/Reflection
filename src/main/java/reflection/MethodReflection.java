@@ -1,32 +1,21 @@
 package reflection;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-
-import static reflection.Boxing.unbox;
-import static reflection.Boxing.wrapperToPrimitive;
 import static reflection.Utils.forceAccessible;
 
 public class MethodReflection {
 
+    /**
+     * invokes the method passed in
+     * @param m method to invoke
+     * @param instance the instance of the object to invoke the method with
+     * @param args the arguments to invoke the method with
+     * @return new instance of constructor
+     */
     public static Object useMethod(Method m, Object instance, Object ... args) {
         try {
             if(args.length == m.getParameterCount()) {
-                for(int i = 0;i < m.getParameterCount();i++) {
-                    if(m.getParameterTypes()[i] != args[i].getClass() && m.getParameterTypes()[i].isPrimitive() && wrapperToPrimitive(args[i].getClass()) == m.getParameterTypes()[i]) {
-                        switch (args[i].getClass().getTypeName()) {
-                            case "byte" -> args[i] = unbox((Byte) args[i]);
-                            case "short" -> args[i] = unbox((Short) args[i]);
-                            case "int" -> args[i] = unbox((Integer) args[i]);
-                            case "long" -> args[i] = unbox((Long) args[i]);
-                            case "float" -> args[i] = unbox((Float) args[i]);
-                            case "double" -> args[i] = unbox((Double) args[i]);
-                            case "char" -> args[i] = unbox((Character) args[i]);
-                            case "boolean" -> args[i] = unbox((Boolean) args[i]);
-                        }
-                    }
-                }
                 forceAccessible(m);
                 return m.invoke(instance ,args);
             }
@@ -36,6 +25,13 @@ public class MethodReflection {
         return null;
     }
 
+    /**
+     * gets method
+     * @param name the name of the method
+     * @param clazz class the method is in
+     * @param classes the argument types of the method
+     * @return the constructor
+     */
     public static Method getMethod(String name, Class clazz, Class ... classes) {
         try {
             Method m = Class.class.getDeclaredMethod("getDeclaredMethods0", boolean.class);

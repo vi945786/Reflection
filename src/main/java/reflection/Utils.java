@@ -12,8 +12,18 @@ import static reflection.MethodReflection.getMethod;
 
 public class Utils {
 
+
+    /**
+     * takes an object, makes it accessible and returns it
+     * @param o object to be made accessible
+     * @return the same object that was passed in but accessible
+     */
     public static Object forceAccessible(Object o) {
         try {
+            if(!(o instanceof AccessibleObject)) {
+                return o;
+            }
+
             Unsafe unsafe = getUnsafe();
             Field f = getField(AccessibleObject.class, "override");
 
@@ -25,6 +35,9 @@ public class Utils {
         return null;
     }
 
+    /**
+     * @return the variable used for unsafe reflection
+     */
     public static Unsafe getUnsafe() {
         try {
             Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
@@ -36,7 +49,14 @@ public class Utils {
         return null;
     }
 
-    public static void setWithUnsafe(Field f, Object value) {
+    /**
+     * forcefully change a field's value
+     * @param f the field to change
+     * @param value the value the field is changing to
+     * @param isStatic is the instance static
+     * @param instance the instance of the object the field is in
+     */
+    public static void forceSet(Field f, Object value, boolean isStatic, Object instance) {
         try {
             Unsafe unsafe = getUnsafe();
             Map<Class, Method> unsafeSet = Map.ofEntries(
@@ -50,12 +70,12 @@ public class Utils {
                     entry(boolean.class, (Method) forceAccessible(getMethod("putBoolean", Unsafe.class, Object.class, long.class, boolean.class)))
             );
 
-            Object FieldBase = unsafe.staticFieldBase(f);
-            long FieldOffset = unsafe.staticFieldOffset(f);
+            Object FieldBase = isStatic ? unsafe.staticFieldBase(f) : instance;
+            long FieldOffset = isStatic ? unsafe.staticFieldOffset(f) : unsafe.objectFieldOffset(f);
 
-            Method m = unsafeSet.get(wrapperToPrimitive(value));
+            Method m = unsafeSet.get(wrapperToPrimitive(value.getClass()));
             if (m != null) {
-                m.invoke(unsafe, FieldBase, FieldOffset, getWrappersConstructors(value).newInstance(value));
+                m.invoke(unsafe, FieldBase, FieldOffset, value);
             } else {
                 unsafe.putObject(FieldBase, FieldOffset, value);
             }

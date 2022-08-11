@@ -6,27 +6,32 @@ import static reflection.Utils.*;
 
 public class FieldsReflection {
 
-    public static void setFieldValue(String fieldName, Object instance, Object value) {
+    /**
+     * sets field's value
+     * @param f field to change
+     * @param instance instance to change the field in
+     * @param value the value to change the field to
+     */
+    public static void setFieldValue(Field f, Object instance, Object value) {
         try {
-
             boolean isStatic = instance instanceof Class<?>;
-            Field f = getField(isStatic ? (Class) instance : instance.getClass(), fieldName);
 
-            if(isStatic) {
-                setWithUnsafe(f, value);
-            } else {
-                forceAccessible(f);
-                f.set(isStatic ? null : instance, value);
-            }
+            forceAccessible(f);
+            forceSet(f, value, isStatic, instance);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static Object getFieldValue(String fieldName, Object instance) {
+    /**
+     * gets field's value
+     * @param f field to get value of
+     * @param instance instance to get field value of
+     * @return value of the field in the instance
+     */
+    public static Object getFieldValue(Field f, Object instance) {
         try {
-            Field f = instance instanceof Class<?> ? ((Class<?>) instance).getDeclaredField(fieldName) : instance.getClass().getDeclaredField(fieldName);
             forceAccessible(f);
             return f.get(instance);
         } catch (Exception e) {
@@ -35,6 +40,12 @@ public class FieldsReflection {
         return null;
     }
 
+    /**
+     * gets field
+     * @param clazz the class the field is in
+     * @param name the name of the field
+     * @return the field
+     */
     public static Field getField(Class clazz, String name) {
         try {
             Method m = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
