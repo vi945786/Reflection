@@ -93,7 +93,11 @@ public class Utils {
             int modifiers = unbox((Integer) useMethod(m, o));
 
             for(int modifier : modifierList) {
-                f.setInt(o, modifiers + modifier);
+                if(modifier < 0) {
+                    f.setInt(o, modifiers & modifier);
+                } else {
+                    f.setInt(o, modifiers + modifier);
+                }
                 m = getMethod("getModifiers", o.getClass());
                 modifiers = unbox((Integer) useMethod(m, o));
             }

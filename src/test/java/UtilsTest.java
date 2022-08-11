@@ -23,6 +23,14 @@ public class UtilsTest {
         assertTrue(Modifier.isVolatile(f.getModifiers()) && Modifier.isStrict(f.getModifiers()));
     }
 
+    @Test
+    public void setModifierVolatileNotPublic() {
+        Field f = getField(FakeClass.class, "wasMethodUsed");
+        assertTrue(Modifier.isPublic(f.getModifiers()));
+        changeModifiers(f, ~Modifier.PUBLIC);
+        assertFalse(Modifier.isPublic(f.getModifiers()));
+    }
+
 
     @Test
     public void forceAccessibleField() {
