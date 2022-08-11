@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import static org.junit.jupiter.api.Assertions.*;
 import static reflection.FieldsReflection.getField;
 import static reflection.Utils.changeModifiers;
+import static reflection.Utils.forceAccessible;
 
 public class UtilsTest {
 
@@ -20,5 +21,13 @@ public class UtilsTest {
         Field f = getField(FakeClass.class, "wasMethodUsed");
         changeModifiers(f, Modifier.VOLATILE, Modifier.STRICT);
         assertTrue(Modifier.isVolatile(f.getModifiers()) && Modifier.isStrict(f.getModifiers()));
+    }
+
+
+    @Test
+    public void forceAccessibleField() {
+        Field f = getField(Field.class, "clazz");
+        forceAccessible(f);
+        assertTrue(f.isAccessible());
     }
 }
