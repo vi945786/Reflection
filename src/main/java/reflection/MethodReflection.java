@@ -9,7 +9,7 @@ public class MethodReflection {
     /**
      * invokes the method passed in
      * @param m method to invoke
-     * @param instance the instance of the object to invoke the method with
+     * @param instance the instance of the object to invoke the method with (null if field is static)
      * @param args the arguments to invoke the method with
      * @return new instance of constructor
      */

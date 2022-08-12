@@ -9,13 +9,11 @@ public class FieldsReflection {
     /**
      * sets field's value
      * @param f field to change
-     * @param instance instance to change the field in
+     * @param instance instance to change the field in (null if field is static)
      * @param value the value to change the field to
      */
     public static void setFieldValue(Field f, Object instance, Object value) {
         try {
-            boolean isStatic = instance instanceof Class<?>;
-
             forceAccessible(f);
             forceSet(f, value, instance instanceof Class<?> ? null : instance);
 
@@ -28,7 +26,7 @@ public class FieldsReflection {
      * gets field's value
      * @param f field to get value of
      * @param instance instance to get field value of
-     * @return value of the field in the instance
+     * @return value of the field in the instance (null if field is static)
      */
     public static Object getFieldValue(Field f, Object instance) {
         try {

@@ -52,7 +52,7 @@ public class Utils {
      * forcefully change a field's value
      * @param f the field to change
      * @param value the value the field is changing to
-     * @param instance the instance of the object the field is in
+     * @param instance the instance of the object the field is in (null if field is static)
      */
     public static void forceSet(Field f, Object value, Object instance) {
         try {
@@ -79,7 +79,7 @@ public class Utils {
      * change modifiers of object
      * @param o object to change modifiers of
      * @param modifierList modifiers to change to
-     * @return object with changed modifiers
+     * @return object with changed modifier
      */
     public static Object changeModifiers(Object o, int ... modifierList) {
         try {
