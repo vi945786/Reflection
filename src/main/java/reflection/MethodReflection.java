@@ -20,8 +20,18 @@ public class MethodReflection {
     public static Object useMethod(Method m, Object instance, Object ... args) {
         try {
             if(args.length == m.getParameterCount()) {
-                forceAccessible(m);
-                return m.invoke(instance ,args);
+                boolean isOverride = override.getBoolean(m);
+
+                if(!isOverride) {
+                    forceAccessible(m, true);
+                }
+
+                Object value = m.invoke(instance ,args);
+
+                if(!isOverride) {
+                    forceAccessible(m, false);
+                }
+                return value;
             }
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
@@ -62,7 +72,7 @@ public class MethodReflection {
                 for (Method method : (Method[]) m.invoke(clazz, false)) {
 
                     Method copy = Method.class.getDeclaredMethod("copy");
-                    forceAccessible(copy);
+                    forceAccessible(copy, true);
 
                     methods.add((Method) copy.invoke(method));
                 }

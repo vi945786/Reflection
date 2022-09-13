@@ -16,13 +16,13 @@ public class Utils {
      * @param o object to be made accessible
      * @return the same object that was passed in but accessible
      */
-    public static <T extends AccessibleObject> T forceAccessible(T o) {
+    public static <T extends AccessibleObject> T forceAccessible(T o, boolean flag) {
         try {
-            if (!override.getBoolean(o)) {
+            if (override.getBoolean(o) != flag) {
                 try {
-                    o.setAccessible(true);
+                    o.setAccessible(flag);
                 } catch (InaccessibleObjectException e) {
-                    unsafe.putBoolean(o, unsafe.objectFieldOffset(override), true);
+                    unsafe.putBoolean(o, unsafe.objectFieldOffset(override), flag);
                 }
             }
         } catch (IllegalArgumentException | IllegalAccessException e) {
@@ -69,27 +69,41 @@ public class Utils {
      */
     public static void forceSet(Field f, Object value, Object instance) {
         if(instance == null || !instance.equals(value)) {
-
             try {
-                f.set(instance, value);
-                if(instance == null || !instance.equals(value)) {
-                    return;
+                boolean isOverride = override.getBoolean(f);
+
+                if(!isOverride) {
+                    forceAccessible(f, true);
                 }
+
+                try {
+                    f.set(instance, value);
+                    if (instance == null || !instance.equals(value)) {
+                        return;
+                    }
+                } catch (IllegalArgumentException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    Object FieldBase = instance == null ? unsafe.staticFieldBase(f) : instance;
+                    long FieldOffset = instance == null ? unsafe.staticFieldOffset(f) : unsafe.objectFieldOffset(f);
+
+                    Class<?> asPrimitive = wrapperToPrimitive(value.getClass());
+                    String asPrimitiveSimple = asPrimitive.getSimpleName();
+                    String methodName = "put" + asPrimitiveSimple.substring(0, 1).toUpperCase() + asPrimitiveSimple.substring(1);
+                    Method m = Unsafe.class.getMethod(methodName, Object.class, long.class, asPrimitive);
+
+                    m.invoke(unsafe, FieldBase, FieldOffset, value);
+                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+
+                if(!isOverride) {
+                    forceAccessible(f, false);
+                }
+
             } catch (IllegalArgumentException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Object FieldBase = instance == null ? unsafe.staticFieldBase(f) : instance;
-                long FieldOffset = instance == null ? unsafe.staticFieldOffset(f) : unsafe.objectFieldOffset(f);
-
-                Class<?> asPrimitive = wrapperToPrimitive(value.getClass());
-                String asPrimitiveSimple = asPrimitive.getSimpleName();
-                String methodName = "put" + asPrimitiveSimple.substring(0, 1).toUpperCase() + asPrimitiveSimple.substring(1);
-                Method m = Unsafe.class.getMethod(methodName, Object.class, long.class, asPrimitive);
-
-                m.invoke(unsafe, FieldBase, FieldOffset, value);
-            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
@@ -105,7 +119,12 @@ public class Utils {
         try {
             if(modifierList.length != 0) {
                 Field f = getField(o.getClass(), "modifiers");
-                forceAccessible(f);
+
+                boolean isOverride = override.getBoolean(f);
+
+                if(!isOverride) {
+                    forceAccessible(f, true);
+                }
 
                 for (int modifier : modifierList) {
                     int modifiers = (int) getFieldValue(f, o);
@@ -119,6 +138,9 @@ public class Utils {
                             f.setInt(o, modifiers + modifier);
                         }
                     }
+                }
+                if(!isOverride) {
+                    forceAccessible(f, false);
                 }
             }
         } catch (IllegalArgumentException | IllegalAccessException e) {

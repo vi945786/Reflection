@@ -15,11 +15,21 @@ public class ConstructorReflection {
      * @param args the arguments to make a new instance with
      * @return new instance of constructor
      */
-    public static Object useConstructor(Constructor<?> c, Object ... args) {
+    public static <T> T useConstructor(Constructor<T> c, Object ... args) {
         try {
             if(args.length == c.getParameterCount()) {
-                forceAccessible(c);
-                return c.newInstance(args);
+                boolean isOverride = override.getBoolean(c);
+
+                if(!isOverride) {
+                    forceAccessible(c, true);
+                }
+
+                T instance = c.newInstance(args);
+
+                if(!isOverride) {
+                    forceAccessible(c, false);
+                }
+                return instance;
             }
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             e.printStackTrace();
@@ -33,8 +43,8 @@ public class ConstructorReflection {
      * @param classes the argument types of the constructor
      * @return the constructor
      */
-    public static Constructor<?> getConstructor(Class<?> clazz, Class<?> ... classes) {
-        for(Constructor<?> constructor : getConstructors(clazz)) {
+    public static <T> Constructor<T> getConstructor(Class<T> clazz, Class<?> ... classes) {
+        for(Constructor<T> constructor : getConstructors(clazz)) {
             if (Arrays.equals(constructor.getParameterTypes(), classes)) {
                 return constructor;
             }
@@ -47,7 +57,7 @@ public class ConstructorReflection {
      * @param clazz the class the field is in
      * @return the fields specified
      */
-    public static Constructor<?>[] getConstructors(Class<?> clazz) {
+    public static <T> Constructor<T>[] getConstructors(Class<T> clazz) {
         try {
             List<Constructor<?>> constructors = new ArrayList<>();
 
@@ -57,7 +67,7 @@ public class ConstructorReflection {
             for (Constructor<?> constructor : (Constructor<?>[]) m.invoke(clazz, false)) {
 
                 Method copy = Constructor.class.getDeclaredMethod("copy");
-                forceAccessible(copy);
+                forceAccessible(copy, true);
 
                 constructors.add((Constructor<?>) copy.invoke(constructor));
             }

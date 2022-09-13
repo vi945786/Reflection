@@ -15,7 +15,6 @@ public class FieldReflection {
      * @param value the value to change the field to
      */
     public static void setFieldValue(Field f, Object instance, Object value) {
-        forceAccessible(f);
         forceSet(f, value, instance instanceof Class<?> ? null : instance);
     }
 
@@ -27,9 +26,20 @@ public class FieldReflection {
      */
     public static Object getFieldValue(Field f, Object instance) {
         try {
-            forceAccessible(f);
-            return f.get(instance);
-        } catch (IllegalArgumentException | IllegalAccessException e) {
+            boolean isOverride = override.getBoolean(f);
+
+            if(!isOverride) {
+                forceAccessible(f, true);
+            }
+
+            Object value = f.get(instance);
+
+            if(!isOverride) {
+                forceAccessible(f, false);
+            }
+
+            return value;
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;
@@ -67,7 +77,7 @@ public class FieldReflection {
                 for (Field field : (Field[]) m.invoke(clazz, false)) {
 
                     Method copy = Field.class.getDeclaredMethod("copy");
-                    forceAccessible(copy);
+                    forceAccessible(copy, true);
 
                     fields.add((Field) copy.invoke(field));
                 }

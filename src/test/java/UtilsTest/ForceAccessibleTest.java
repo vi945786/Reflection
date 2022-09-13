@@ -13,7 +13,9 @@ public class ForceAccessibleTest {
     public void forceAccessibleField() {
         Field f = getField(Field.class, "clazz");
         assertFalse(f.canAccess(f));
-        forceAccessible(f);
+        forceAccessible(f, true);
         assertTrue(f.canAccess(f));
+        forceAccessible(f, false);
+        assertFalse(f.canAccess(f));
     }
 }
