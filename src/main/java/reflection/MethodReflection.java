@@ -52,7 +52,7 @@ public class MethodReflection {
                 return method;
             }
         }
-        return null;
+        throw new NullPointerException("method doesn't exist");
     }
 
     /**
@@ -85,6 +85,6 @@ public class MethodReflection {
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        return null;
+        throw new NullPointerException("no methods in class");
     }
 }

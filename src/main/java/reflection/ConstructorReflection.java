@@ -43,13 +43,13 @@ public class ConstructorReflection {
      * @param classes the argument types of the constructor
      * @return the constructor
      */
-    public static <T> Constructor<T> getConstructor(Class<T> clazz, Class<?> ... classes) {
-        for(Constructor<T> constructor : getConstructors(clazz)) {
+    public static Constructor<?> getConstructor(Class<?> clazz, Class<?> ... classes) {
+        for(Constructor<?> constructor : getConstructors(clazz)) {
             if (Arrays.equals(constructor.getParameterTypes(), classes)) {
                 return constructor;
             }
         }
-        return null;
+        throw new NullPointerException("constructor doesn't exist");
     }
 
     /**
@@ -57,7 +57,7 @@ public class ConstructorReflection {
      * @param clazz the class the field is in
      * @return the fields specified
      */
-    public static <T> Constructor<T>[] getConstructors(Class<T> clazz) {
+    public static Constructor<?>[] getConstructors(Class<?> clazz) {
         try {
             List<Constructor<?>> constructors = new ArrayList<>();
 
@@ -76,6 +76,6 @@ public class ConstructorReflection {
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        return null;
+        throw new NullPointerException("no constructors in class");
     }
 }
