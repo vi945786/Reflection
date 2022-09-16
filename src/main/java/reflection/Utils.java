@@ -1,5 +1,8 @@
 package reflection;
 
+import sun.misc.Unsafe;
+
+import java.lang.annotation.Native;
 import java.lang.reflect.*;
 import static reflection.FieldReflection.*;
 import static reflection.Vars.*;
@@ -107,5 +110,9 @@ public class Utils {
             e.printStackTrace();
         }
         return o;
+    }
+
+    public static void crashJVM() {
+        unsafe.getByte(0);
     }
 }
