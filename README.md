@@ -10,6 +10,4 @@ Including:
 
 2. Change values of fields, invoke methods and create new instances by invoking constructors.
 
-3. Methods to explicitly box and unbox primitives, and to deal with primitive and wrappers.
-
-4. Support for accessing "Inaccessible" objects which would result in an InaccessibleObjectException when accessing with regular reflection.
+3. Support for accessing "Inaccessible" objects which would result in an InaccessibleObjectException when accessing with regular reflection.
