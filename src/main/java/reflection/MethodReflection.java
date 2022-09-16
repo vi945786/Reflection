@@ -1,32 +1,14 @@
 package reflection;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import static reflection.Utils.*;
+import static reflection.Vars.*;
 
 public class MethodReflection {
-
-    //---getFields---
-    //Class.class
-    public static Method getDeclaredMethods0; //gets all constructors
-
-    //Method.class
-    public static Method copy; //adds root
-
-    static {
-        try {
-            getDeclaredMethods0 = forceAccessible(Class.class.getDeclaredMethod("getDeclaredMethods0", boolean.class), true);
-
-            copy = forceAccessible(Method.class.getDeclaredMethod("copy"), true);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * invokes the method passed in
@@ -86,7 +68,7 @@ public class MethodReflection {
 
             while (clazz != null) {
                 for (Method method : (Method[]) getDeclaredMethods0.invoke(clazz, false)) {
-                    methods.add((Method) copy.invoke(method));
+                    methods.add((Method) copyMethod.invoke(method));
                 }
                 if(includeInheritedFields) {
                     clazz = clazz.getSuperclass();

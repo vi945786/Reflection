@@ -4,27 +4,10 @@ import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import static reflection.Utils.*;
+import static reflection.Vars.*;
 
 public class ConstructorReflection {
-
-    //---getFields---
-    //Class.class
-    public static Method getDeclaredConstructors0; //gets all constructors
-
-    //Constructor.class
-    public static Method copy; //adds root
-
-    static {
-        try {
-            getDeclaredConstructors0 = forceAccessible(Class.class.getDeclaredMethod("getDeclaredConstructors0", boolean.class), true);
-
-            copy = forceAccessible(Constructor.class.getDeclaredMethod("copy"), true);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * makes a new instance of the constructor passed in
@@ -79,7 +62,7 @@ public class ConstructorReflection {
             List<Constructor<?>> constructors = new ArrayList<>();
 
             for (Constructor<?> constructor : (Constructor<?>[]) getDeclaredConstructors0.invoke(clazz, false)) {
-                constructors.add((Constructor<?>) copy.invoke(constructor));
+                constructors.add((Constructor<?>) copyConstructor.invoke(constructor));
             }
 
             if(constructors.isEmpty()) {

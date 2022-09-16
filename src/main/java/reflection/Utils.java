@@ -1,14 +1,10 @@
 package reflection;
 
-import sun.misc.Unsafe;
 import java.lang.reflect.*;
-import static reflection.FieldReflection.getField;
-import static reflection.FieldReflection.getFieldValue;
+import static reflection.FieldReflection.*;
+import static reflection.Vars.*;
 
 public class Utils {
-
-    public static Unsafe unsafe = getUnsafe();
-    public static Field override = getOverride();
 
     /**
      * takes an object, makes it accessible and returns it
@@ -25,28 +21,49 @@ public class Utils {
     }
 
     /**
-     * @return the variable used for unsafe reflection
+     * when you get an IllegalAccessException that says "Can not set [Field] to [type]" use this or add a fieldAccessor to make the field use it
+     * @param f field to make writable
+     * @param fieldAccessor the fieldAccessor to make the field use
+     * @return the field but writable or with the fieldAccessor
      */
-    public static Unsafe getUnsafe() {
+    public static Field forceWritable(Field f, Object fieldAccessor) {
         try {
-            Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-            unsafeField.setAccessible(true);
-            return (Unsafe) unsafeField.get(null);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            if(fieldAccessor == null) {
+                Field root = (Field) rootField.get(f);
+                Object currentOverrideFieldAccessor = overrideFieldAccessorField.get(f);
+                if (currentOverrideFieldAccessor == null || setterField.get(currentOverrideFieldAccessor) == null) {
+                    Object newOverrideFieldAccessor = newFieldAccessor.invoke(reflectionFactory, root, true);
+
+                    if (setterField.get(newOverrideFieldAccessor) == null) {
+                        int fieldFlags = fieldFlagsField.getInt(newOverrideFieldAccessor);
+                        if (fieldFlags % 2 == 1) {
+                            fieldFlagsField.set(newOverrideFieldAccessor, fieldFlags - 1);
+                        }
+
+                        setterField.set(newOverrideFieldAccessor, make.invoke(null, f.getDeclaringClass(), memberNameConstructor.newInstance(f, true)));
+                        overrideFieldAccessorField.set(f, newOverrideFieldAccessor);
+                    }
+                }
+            } else {
+                overrideFieldAccessorField.set(f, fieldAccessor);
+            }
+        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             e.printStackTrace();
         }
-        return null;
+
+        return f;
     }
 
     /**
-     * @return the field "override" from AccessibleObject
+     * makes a new object of type FieldAccessor
+     * @param f field to make a FieldAccessor of
+     * @param override if it should use root
+     * @return a FieldAccessor of the field passed in
      */
-    public static Field getOverride() {
+    public static Object makeFieldAccessor(Field f, boolean override) {
         try {
-            Method m = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
-            m.setAccessible(true);
-            return forceAccessible(((Field[]) m.invoke(AccessibleObject.class, false))[0], true);
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            return newFieldAccessor.invoke(reflectionFactory, f, override);
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
