@@ -2,7 +2,6 @@ package reflection;
 
 import sun.misc.Unsafe;
 import java.lang.reflect.*;
-import static reflection.Boxing.*;
 import static reflection.FieldReflection.getField;
 import static reflection.FieldReflection.getFieldValue;
 
@@ -10,6 +9,7 @@ public class Utils {
 
     public static Unsafe unsafe = getUnsafe();
     public static Field override = getOverride();
+
 
     /**
      * takes an object, makes it accessible and returns it
@@ -20,7 +20,7 @@ public class Utils {
         try {
             o.setAccessible(flag);
         } catch (InaccessibleObjectException e) {
-            unsafe.putBoolean(o, unsafe.objectFieldOffset(override), flag);
+            unsafe.putBoolean(o, 12, flag);
         }
         return o;
     }
@@ -46,9 +46,7 @@ public class Utils {
         try {
             Method m = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
             m.setAccessible(true);
-            Field override = ((Field[]) m.invoke(AccessibleObject.class, false))[0];
-            unsafe.putBoolean(override, unsafe.objectFieldOffset(override), true);
-            return override;
+            return forceAccessible(((Field[]) m.invoke(AccessibleObject.class, false))[0], true);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }

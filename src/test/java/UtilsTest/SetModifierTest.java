@@ -13,10 +13,10 @@ public class SetModifierTest {
 
     @Test
     public void setModifierFinal() {
-    Field f = getField(FakeClass.class, "wasMethodUsed");
-    assertFalse(Modifier.isFinal(f.getModifiers()));
-    changeModifiers(f, Modifier.FINAL);
-    assertTrue(Modifier.isFinal(f.getModifiers()));
+        Field f = getField(FakeClass.class, "wasMethodUsed");
+        assertFalse(Modifier.isFinal(f.getModifiers()));
+        changeModifiers(f, Modifier.FINAL);
+        assertTrue(Modifier.isFinal(f.getModifiers()));
     }
 
     @Test

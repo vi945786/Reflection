@@ -3,6 +3,7 @@ package vars;
 public class FakeClass {
     private final int privateFinalField;
     private static final int privateStaticFinalField = 0;
+    private static int privateStaticField = 0;
     private static final int privateStaticFinalFieldSuperclass = 0;
     public boolean wasMethodUsed = false;
     public static boolean wasStaticMethodUsedWith = false;
