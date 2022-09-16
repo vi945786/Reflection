@@ -18,8 +18,8 @@ public class FieldReflection {
     //---setFieldValue---
     //FieldAccessor.class
     public static Class<?> fieldAccessorClass;
-    public static Field fieldFlagsField; //field modifiers
-    public static Field setterField; //field value setter
+    public static Field fieldFlagsField;
+    public static Field setterField;
 
     //ReflectionFactory.class
     public static Class<?> reflectionFactoryClass;
@@ -36,7 +36,8 @@ public class FieldReflection {
     public static Method make; //makes new instance
 
     //Field.class
-    public static Field overrideFieldAccessorField; //overrideFieldAccessor
+    public static Field overrideFieldAccessorField;
+    public static Field rootField;
 
     static {
         try {
@@ -62,6 +63,7 @@ public class FieldReflection {
             make = forceAccessible(directMethodHandleClass.getDeclaredMethod("make", Class.class, memberNameClass), true);
 
             overrideFieldAccessorField = forceAccessible((Field) copy.invoke(((Field[]) getDeclaredFields0.invoke(Field.class, false))[10]), true);
+            rootField = forceAccessible((Field) copy.invoke(((Field[]) getDeclaredFields0.invoke(Field.class, false))[11]), true);
         } catch (NoSuchMethodException | ClassNotFoundException | InvocationTargetException | IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
         }
@@ -75,7 +77,7 @@ public class FieldReflection {
      */
     public static void setFieldValue(Field f, Object instance, Object value) {
         try {
-            Field root = (Field) forceAccessible(getField(Field.class, "root"), true).get(f);
+            Field root = (Field) rootField.get(f);
 
             Object currentOverrideFieldAccessor = overrideFieldAccessorField.get(f);
             if(currentOverrideFieldAccessor == null || setterField.get(currentOverrideFieldAccessor) == null) {
@@ -147,10 +149,11 @@ public class FieldReflection {
      * gets field from class and all superclasses
      * @param clazz the class the field is in
      * @param name the name of the field
+     * @param includeInheritedFields if to search in the superclasses
      * @return the field
      */
-    public static Field getField(Class<?> clazz, String name) {
-            for(Field field : getFields(clazz, true)) {
+    public static Field getField(Class<?> clazz, String name, boolean includeInheritedFields) {
+            for(Field field : getFields(clazz, includeInheritedFields)) {
                 if (field.getName().equals(name)) {
                     return field;
                 }
@@ -174,9 +177,14 @@ public class FieldReflection {
                 }
                 if(includeInheritedFields) {
                     clazz = clazz.getSuperclass();
+                } else {
+                    clazz = null;
                 }
             }
 
+            if(fields.isEmpty()) {
+                throw new NullPointerException("no fields in class");
+            }
             return fields.toArray(new Field[]{fields.get(0)});
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();

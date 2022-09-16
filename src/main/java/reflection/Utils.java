@@ -61,7 +61,7 @@ public class Utils {
     public static Object changeModifiers(AccessibleObject o, int ... modifierList) {
         try {
             if(modifierList.length != 0) {
-                Field f = getField(o.getClass(), "modifiers");
+                Field f = getField(o.getClass(), "modifiers", false);
 
                 boolean isOverride = override.getBoolean(f);
 

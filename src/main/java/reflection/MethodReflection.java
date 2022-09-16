@@ -61,11 +61,12 @@ public class MethodReflection {
      * gets method from class and all superclasses
      * @param clazz class the method is in
      * @param name the name of the method
+     * @param includeInheritedFields if to search in the superclasses
      * @param classes the argument types of the method
      * @return the constructor
      */
-    public static Method getMethod(Class<?> clazz, String name, Class<?> ... classes) {
-        for(Method method : getMethods(clazz, true)) {
+    public static Method getMethod(Class<?> clazz, String name, boolean includeInheritedFields, Class<?> ... classes) {
+        for(Method method : getMethods(clazz, includeInheritedFields)) {
             if (method.getName().equals(name) && Arrays.equals(method.getParameterTypes(), classes)) {
                 return method;
             }
@@ -89,11 +90,16 @@ public class MethodReflection {
                 }
                 if(includeInheritedFields) {
                     clazz = clazz.getSuperclass();
+                } else {
+                    clazz = null;
                 }
             }
 
+            if(methods.isEmpty()) {
+                throw new NullPointerException("no methods in class");
+            }
             return methods.toArray(new Method[]{methods.get(0)});
-        } catch (InvocationTargetException | IllegalAccessException e) {
+        } catch (InvocationTargetException | IllegalAccessException | IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
         throw new NullPointerException("no methods in class");

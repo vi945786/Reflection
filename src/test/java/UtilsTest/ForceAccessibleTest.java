@@ -13,7 +13,7 @@ public class ForceAccessibleTest {
 
     @Test
     public void forceAccessibleField() throws IllegalAccessException {
-        Field f = getField(Field.class, "clazz");
+        Field f = getField(Field.class, "clazz", false);
         assertFalse(override.getBoolean(f));
         forceAccessible(f, true);
         assertTrue(override.getBoolean(f));

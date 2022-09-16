@@ -10,33 +10,33 @@ public class FieldTest {
     public void setPrivateFinalField() {
         FakeClass fakeClass = new FakeClass("");
 
-        FieldReflection.setFieldValue(getField(FakeClass.class, "privateFinalField"), fakeClass, 1);
-        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass.class, "privateFinalField"), fakeClass));
+        FieldReflection.setFieldValue(getField(FakeClass.class, "privateFinalField", false), fakeClass, 1);
+        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass.class, "privateFinalField", false), fakeClass));
+    }
+
+    @Test
+    public void setPrivateStaticField() {
+        FieldReflection.setFieldValue(getField(FakeClass.class, "privateStaticField", false), null, 1);
+        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass.class, "privateStaticField", false), null));
     }
 
     @Test
     public void setPrivateStaticFinalField() {
-        FieldReflection.setFieldValue(getField(FakeClass.class, "privateStaticFinalField"), null, 1);
-        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass.class, "privateStaticFinalField"), null));
+        FieldReflection.setFieldValue(getField(FakeClass.class, "privateStaticFinalField", false), null, 1);
+        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass.class, "privateStaticFinalField", false), null));
     }
 
     @Test
     public void setPrivateFinalFieldSuperclass() {
         FakeClass2 fakeClass2 = new FakeClass2();
 
-        FieldReflection.setFieldValue(getField(FakeClass2.class, "privateFinalField"), fakeClass2, 1);
-        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass2.class, "privateFinalField"), fakeClass2));
+        FieldReflection.setFieldValue(getField(FakeClass2.class, "privateFinalField", true), fakeClass2, 1);
+        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass2.class, "privateFinalField", true), fakeClass2));
     }
 
     @Test
     public void setPrivateStaticFinalFieldSuperclass() {
-        FieldReflection.setFieldValue(getField(FakeClass2.class, "privateStaticFinalFieldSuperclass"), null, 1);
-        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass2.class, "privateStaticFinalFieldSuperclass"), null));
-    }
-
-    @Test
-    public void setPrivateStaticField() {
-        FieldReflection.setFieldValue(getField(FakeClass2.class, "privateStaticField"), null, 1);
-        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass2.class, "privateStaticField"), null));
+        FieldReflection.setFieldValue(getField(FakeClass2.class, "privateStaticFinalFieldSuperclass", true), null, 1);
+        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass2.class, "privateStaticFinalFieldSuperclass", true), null));
     }
 }
