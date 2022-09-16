@@ -9,6 +9,23 @@ import static reflection.Utils.*;
 
 public class ConstructorReflection {
 
+    //---getFields---
+    //Class.class
+    public static Method getDeclaredConstructors0; //gets all constructors
+
+    //Constructor.class
+    public static Method copy; //adds root
+
+    static {
+        try {
+            getDeclaredConstructors0 = forceAccessible(Class.class.getDeclaredMethod("getDeclaredConstructors0", boolean.class), true);
+
+            copy = forceAccessible(Constructor.class.getDeclaredMethod("copy"), true);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * makes a new instance of the constructor passed in
      * @param c constructor to create new instance of
@@ -61,19 +78,12 @@ public class ConstructorReflection {
         try {
             List<Constructor<?>> constructors = new ArrayList<>();
 
-            Method m = Class.class.getDeclaredMethod("getDeclaredConstructors0", boolean.class);
-            m.setAccessible(true);
-
-            for (Constructor<?> constructor : (Constructor<?>[]) m.invoke(clazz, false)) {
-
-                Method copy = Constructor.class.getDeclaredMethod("copy");
-                forceAccessible(copy, true);
-
+            for (Constructor<?> constructor : (Constructor<?>[]) getDeclaredConstructors0.invoke(clazz, false)) {
                 constructors.add((Constructor<?>) copy.invoke(constructor));
             }
 
             return constructors.toArray(new Constructor[]{constructors.get(0)});
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+        } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
         throw new NullPointerException("no constructors in class");

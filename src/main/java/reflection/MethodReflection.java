@@ -1,5 +1,6 @@
 package reflection;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -9,6 +10,23 @@ import java.util.List;
 import static reflection.Utils.*;
 
 public class MethodReflection {
+
+    //---getFields---
+    //Class.class
+    public static Method getDeclaredMethods0; //gets all constructors
+
+    //Method.class
+    public static Method copy; //adds root
+
+    static {
+        try {
+            getDeclaredMethods0 = forceAccessible(Class.class.getDeclaredMethod("getDeclaredMethods0", boolean.class), true);
+
+            copy = forceAccessible(Method.class.getDeclaredMethod("copy"), true);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * invokes the method passed in
@@ -65,15 +83,8 @@ public class MethodReflection {
         try {
             List<Method> methods = new ArrayList<>();
 
-            Method m = Class.class.getDeclaredMethod("getDeclaredMethods0", boolean.class);
-            m.setAccessible(true);
-
             while (clazz != null) {
-                for (Method method : (Method[]) m.invoke(clazz, false)) {
-
-                    Method copy = Method.class.getDeclaredMethod("copy");
-                    forceAccessible(copy, true);
-
+                for (Method method : (Method[]) getDeclaredMethods0.invoke(clazz, false)) {
                     methods.add((Method) copy.invoke(method));
                 }
                 if(includeInheritedFields) {
@@ -82,7 +93,7 @@ public class MethodReflection {
             }
 
             return methods.toArray(new Method[]{methods.get(0)});
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+        } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
         throw new NullPointerException("no methods in class");

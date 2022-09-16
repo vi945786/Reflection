@@ -10,7 +10,6 @@ public class Utils {
     public static Unsafe unsafe = getUnsafe();
     public static Field override = getOverride();
 
-
     /**
      * takes an object, makes it accessible and returns it
      * @param o object to be made accessible

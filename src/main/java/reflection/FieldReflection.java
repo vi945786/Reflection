@@ -3,63 +3,66 @@ package reflection;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import static reflection.ConstructorReflection.getConstructor;
-import static reflection.MethodReflection.getMethod;
 import static reflection.Utils.*;
 
 public class FieldReflection {
 
-    public static Field fieldAccessorField;
-    public static Field overrideFieldAccessorField;
-    public static Class<?> reflectionFactoryClass;
-    public static Method getReflectionFactory;
-    public static Object reflectionFactory;
-    public static Method newFieldAccessor;
+    //---getFields---
+    //Class.class
+    public static Method getDeclaredFields0; //gets all fields
+
+    //Field.class
+    public static Method copy; //adds root
+
+
+    //---setFieldValue---
+    //FieldAccessor.class
     public static Class<?> fieldAccessorClass;
-    public static Field isReadOnly;
-    public static Field setterField;
+    public static Field fieldFlagsField; //field modifiers
+    public static Field setterField; //field value setter
+
+    //ReflectionFactory.class
+    public static Class<?> reflectionFactoryClass;
+    public static Method getReflectionFactory; //gets the instance
+    public static Object reflectionFactory; //the instance
+    public static Method newFieldAccessor; //new FieldAccessor
+
+    //MemberName.class
     public static Class<?> memberNameClass;
-    public static Constructor<?> newMemberNameClass;
-    public static Class<?> directMethodHandle;
-    public static Method make;
+    public static Constructor<?> memberNameConstructor;
+
+    //DirectMethodHandle.class
+    public static Class<?> directMethodHandleClass;
+    public static Method make; //makes new instance
+
+    //Field.class
+    public static Field overrideFieldAccessorField; //overrideFieldAccessor
 
     static {
         try {
-            fieldAccessorField = getField(Field.class, "fieldAccessor");
-            forceAccessible(fieldAccessorField, true);
+            getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
+            getDeclaredFields0.setAccessible(true);
 
-            overrideFieldAccessorField = getField(Field.class, "overrideFieldAccessor");
-            forceAccessible(overrideFieldAccessorField, true);
+            copy = forceAccessible(Field.class.getDeclaredMethod("copy"), true);
 
-            reflectionFactoryClass = Class.forName("jdk.internal.reflect.ReflectionFactory");
-
-            getReflectionFactory = reflectionFactoryClass.getDeclaredMethod("getReflectionFactory");
-            forceAccessible(getReflectionFactory, true);
-
-            reflectionFactory = getReflectionFactory.invoke(null);
-
-            newFieldAccessor = reflectionFactoryClass.getDeclaredMethod("newFieldAccessor", Field.class, boolean.class);
-            forceAccessible(newFieldAccessor, true);
 
             fieldAccessorClass = Class.forName("jdk.internal.reflect.MethodHandleFieldAccessorImpl");
+            fieldFlagsField = forceAccessible(fieldAccessorClass.getDeclaredField("fieldFlags"), true);
+            setterField = forceAccessible(fieldAccessorClass.getDeclaredField("setter"), true);
 
-            isReadOnly = getField(fieldAccessorClass, "fieldFlags");
-            forceAccessible(isReadOnly, true);
-
-            setterField = getField(fieldAccessorClass, "setter");
-            forceAccessible(setterField, true);
+            reflectionFactoryClass = Class.forName("jdk.internal.reflect.ReflectionFactory");
+            getReflectionFactory = forceAccessible(reflectionFactoryClass.getDeclaredMethod("getReflectionFactory"), true);
+            reflectionFactory = getReflectionFactory.invoke(null);
+            newFieldAccessor = forceAccessible(reflectionFactoryClass.getDeclaredMethod("newFieldAccessor", Field.class, boolean.class), true);
 
             memberNameClass = Class.forName("java.lang.invoke.MemberName");
+            memberNameConstructor = forceAccessible(memberNameClass.getDeclaredConstructor(Field.class, boolean.class), true);
 
-            newMemberNameClass = getConstructor(memberNameClass, Field.class, boolean.class);
-            forceAccessible(newMemberNameClass, true);
+            directMethodHandleClass = Class.forName("java.lang.invoke.DirectMethodHandle");
+            make = forceAccessible(directMethodHandleClass.getDeclaredMethod("make", Class.class, memberNameClass), true);
 
-            directMethodHandle = Class.forName("java.lang.invoke.DirectMethodHandle");
-
-            make = getMethod(directMethodHandle, "make", Class.class, memberNameClass);
-            forceAccessible(make, true);
-        } catch (NoSuchMethodException | ClassNotFoundException | InvocationTargetException | IllegalAccessException e) {
+            overrideFieldAccessorField = forceAccessible((Field) copy.invoke(((Field[]) getDeclaredFields0.invoke(Field.class, false))[10]), true);
+        } catch (NoSuchMethodException | ClassNotFoundException | InvocationTargetException | IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
         }
     }
@@ -79,18 +82,27 @@ public class FieldReflection {
                 Object newOverrideFieldAccessor = newFieldAccessor.invoke(reflectionFactory, root, true);
 
                 if(setterField.get(newOverrideFieldAccessor) == null) {
-                    int isReadOnlyValue = isReadOnly.getInt(newOverrideFieldAccessor);
-                    if(isReadOnlyValue % 2 == 1) {
-                        isReadOnly.set(newOverrideFieldAccessor, isReadOnlyValue -1);
+                    int fieldFlags = fieldFlagsField.getInt(newOverrideFieldAccessor);
+                    if(fieldFlags % 2 == 1) {
+                        fieldFlagsField.set(newOverrideFieldAccessor, fieldFlags -1);
                     }
 
-                    setterField.set(newOverrideFieldAccessor, make.invoke(null, f.getDeclaringClass(), newMemberNameClass.newInstance(f, true)));
+                    setterField.set(newOverrideFieldAccessor, make.invoke(null, f.getDeclaringClass(), memberNameConstructor.newInstance(f, true)));
                     overrideFieldAccessorField.set(f, newOverrideFieldAccessor);
                 }
             }
 
-            forceAccessible(f, true);
+            boolean isOverride = override.getBoolean(f);
+
+            if(!isOverride) {
+                forceAccessible(f, true);
+            }
+
             f.set(instance, value);
+
+            if(!isOverride) {
+                forceAccessible(f, false);
+            }
 
             overrideFieldAccessorField.set(f, currentOverrideFieldAccessor);
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
@@ -156,15 +168,8 @@ public class FieldReflection {
         try {
             List<Field> fields = new ArrayList<>();
 
-            Method m = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
-            m.setAccessible(true);
-
             while (clazz != null) {
-                for (Field field : (Field[]) m.invoke(clazz, false)) {
-
-                    Method copy = Field.class.getDeclaredMethod("copy");
-                    forceAccessible(copy, true);
-
+                for (Field field : (Field[]) getDeclaredFields0.invoke(clazz, false)) {
                     fields.add((Field) copy.invoke(field));
                 }
                 if(includeInheritedFields) {
@@ -173,7 +178,7 @@ public class FieldReflection {
             }
 
             return fields.toArray(new Field[]{fields.get(0)});
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+        } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
         throw new NullPointerException("no fields in class");
