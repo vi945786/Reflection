@@ -102,6 +102,6 @@ public class MethodReflection {
         } catch (InvocationTargetException | IllegalAccessException | IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
-        throw new NullPointerException("no methods in class");
+        return null;
     }
 }

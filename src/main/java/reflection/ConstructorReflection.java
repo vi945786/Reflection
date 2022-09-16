@@ -82,10 +82,13 @@ public class ConstructorReflection {
                 constructors.add((Constructor<?>) copy.invoke(constructor));
             }
 
+            if(constructors.isEmpty()) {
+                throw new NullPointerException("no constructors in class");
+            }
             return constructors.toArray(new Constructor[]{constructors.get(0)});
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        throw new NullPointerException("no constructors in class");
+        return null;
     }
 }

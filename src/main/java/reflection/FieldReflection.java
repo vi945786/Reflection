@@ -189,6 +189,6 @@ public class FieldReflection {
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        throw new NullPointerException("no fields in class");
+        return null;
     }
 }
