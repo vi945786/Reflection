@@ -2,15 +2,12 @@ import org.junit.jupiter.api.Test;
 import sun.misc.Unsafe;
 import vars.FakeClass;
 import vars.FakeClass2;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static reflection.FieldReflection.getField;
 import static reflection.FieldReflection.getFieldValue;
 import static reflection.MethodReflection.*;
-import static reflection.Utils.forceAccessible;
 
 public class MethodTest {
 

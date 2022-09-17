@@ -18,7 +18,7 @@ public class ConstructorReflection {
     public static <T> T useConstructor(Constructor<T> c, Object ... args) {
         try {
             if(args.length == c.getParameterCount()) {
-                boolean isOverride = override.getBoolean(c);
+                boolean isOverride = overrideField.getBoolean(c);
 
                 if(!isOverride) {
                     forceAccessible(c, true);
@@ -61,8 +61,8 @@ public class ConstructorReflection {
         try {
             List<Constructor<?>> constructors = new ArrayList<>();
 
-            for (Constructor<?> constructor : (Constructor<?>[]) getDeclaredConstructors0.invoke(clazz, false)) {
-                constructors.add((Constructor<?>) copyConstructor.invoke(constructor));
+            for (Constructor<?> constructor : (Constructor<?>[]) getDeclaredConstructors0Method.invoke(clazz, false)) {
+                constructors.add((Constructor<?>) copyConstructorMethod.invoke(constructor));
             }
 
             if(constructors.isEmpty()) {

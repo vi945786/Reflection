@@ -11,21 +11,21 @@ public class Vars {
     public static Unsafe unsafe;
 
     //Class.class
-    public static Method getDeclaredConstructors0; //gets all constructors
-    public static Method getDeclaredFields0; //gets all fields
-    public static Method getDeclaredMethods0; //gets all constructors
+    public static Method getDeclaredConstructors0Method; //gets all constructors
+    public static Method getDeclaredFields0Method; //gets all fields
+    public static Method getDeclaredMethods0Method; //gets all constructors
 
     //Constructor.class
-    public static Method copyConstructor; //adds root
+    public static Method copyConstructorMethod; //adds root
 
     //Field.class
-    public static Method copyField; //adds root
+    public static Method copyFieldMethod; //adds root
     public static Field overrideFieldAccessorField;
     public static Field rootField;
-    public static Field override;
+    public static Field overrideField;
 
     //Method.class
-    public static Method copyMethod; //adds root
+    public static Method copyMethodMethod; //adds root
 
     //FieldAccessor.class
     public static Class<?> fieldAccessorClass;
@@ -34,9 +34,9 @@ public class Vars {
 
     //ReflectionFactory.class
     public static Class<?> reflectionFactoryClass;
-    public static Method getReflectionFactory; //gets the instance
+    public static Method getReflectionFactoryMethod; //gets the instance
     public static Object reflectionFactory; //the instance
-    public static Method newFieldAccessor; //new FieldAccessor
+    public static Method newFieldAccessorMethod; //new FieldAccessor
 
     //MemberName.class
     public static Class<?> memberNameClass;
@@ -44,7 +44,7 @@ public class Vars {
 
     //DirectMethodHandle.class
     public static Class<?> directMethodHandleClass;
-    public static Method make; //makes new instance
+    public static Method makeMethod; //makes new instance
 
     static {
         try {
@@ -57,28 +57,24 @@ public class Vars {
             }
 
             {
-                getDeclaredConstructors0 = forceAccessible(Class.class.getDeclaredMethod("getDeclaredConstructors0", boolean.class), true);
-                getDeclaredFields0 = forceAccessible(Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class), true);
-                getDeclaredMethods0 = forceAccessible(Class.class.getDeclaredMethod("getDeclaredMethods0", boolean.class), true);
+                getDeclaredConstructors0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredConstructors0", boolean.class), true);
+                getDeclaredFields0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class), true);
+                getDeclaredMethods0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredMethods0", boolean.class), true);
             }
 
             {
-                copyConstructor = forceAccessible(Constructor.class.getDeclaredMethod("copy"), true);
+                copyConstructorMethod = forceAccessible(Constructor.class.getDeclaredMethod("copy"), true);
             }
 
             {
-                copyField = forceAccessible(Field.class.getDeclaredMethod("copy"), true);
-                overrideFieldAccessorField = forceAccessible((Field) copyField.invoke(((Field[]) getDeclaredFields0.invoke(Field.class, false))[10]), true);
-                rootField = forceAccessible((Field) copyField.invoke(((Field[]) getDeclaredFields0.invoke(Field.class, false))[11]), true);
-                {
-                    Method m = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
-                    m.setAccessible(true);
-                    override = forceAccessible(((Field[]) m.invoke(AccessibleObject.class, false))[0], true);
-                }
+                copyFieldMethod = forceAccessible(Field.class.getDeclaredMethod("copy"), true);
+                overrideFieldAccessorField = forceAccessible((Field) copyFieldMethod.invoke(((Field[]) getDeclaredFields0Method.invoke(Field.class, false))[10]), true);
+                rootField = forceAccessible((Field) copyFieldMethod.invoke(((Field[]) getDeclaredFields0Method.invoke(Field.class, false))[11]), true);
+                overrideField = forceAccessible(((Field[]) getDeclaredFields0Method.invoke(AccessibleObject.class, false))[0], true);
             }
 
             {
-                copyMethod = forceAccessible(Method.class.getDeclaredMethod("copy"), true);
+                copyMethodMethod = forceAccessible(Method.class.getDeclaredMethod("copy"), true);
             }
 
             {
@@ -89,9 +85,9 @@ public class Vars {
 
             {
                 reflectionFactoryClass = Class.forName("jdk.internal.reflect.ReflectionFactory");
-                getReflectionFactory = forceAccessible(reflectionFactoryClass.getDeclaredMethod("getReflectionFactory"), true);
-                reflectionFactory = getReflectionFactory.invoke(null);
-                newFieldAccessor = forceAccessible(reflectionFactoryClass.getDeclaredMethod("newFieldAccessor", Field.class, boolean.class), true);
+                getReflectionFactoryMethod = forceAccessible(reflectionFactoryClass.getDeclaredMethod("getReflectionFactory"), true);
+                reflectionFactory = getReflectionFactoryMethod.invoke(null);
+                newFieldAccessorMethod = forceAccessible(reflectionFactoryClass.getDeclaredMethod("newFieldAccessor", Field.class, boolean.class), true);
             }
 
             {
@@ -101,7 +97,7 @@ public class Vars {
 
             {
                 directMethodHandleClass = Class.forName("java.lang.invoke.DirectMethodHandle");
-                make = forceAccessible(directMethodHandleClass.getDeclaredMethod("make", Class.class, memberNameClass), true);
+                makeMethod = forceAccessible(directMethodHandleClass.getDeclaredMethod("make", Class.class, memberNameClass), true);
             }
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchFieldException e) {
             e.printStackTrace();

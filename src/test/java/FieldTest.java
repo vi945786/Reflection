@@ -15,15 +15,29 @@ public class FieldTest {
     }
 
     @Test
+    public void setPrivateStaticFinalField() {
+        FieldReflection.setFieldValue(getField(FakeClass.class, "privateStaticFinalField", false), null, 1);
+        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass.class, "privateStaticFinalField", false), null));
+    }
+
+    @Test
     public void setPrivateStaticField() {
         FieldReflection.setFieldValue(getField(FakeClass.class, "privateStaticField", false), null, 1);
         assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass.class, "privateStaticField", false), null));
     }
 
     @Test
-    public void setPrivateStaticFinalField() {
-        FieldReflection.setFieldValue(getField(FakeClass.class, "privateStaticFinalField", false), null, 1);
-        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass.class, "privateStaticFinalField", false), null));
+    public void setPrivateVolatileField() {
+        FakeClass fakeClass = new FakeClass("");
+
+        FieldReflection.setFieldValue(getField(FakeClass.class, "privateVolatileField", false), fakeClass, 1);
+        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass.class, "privateVolatileField", false), fakeClass));
+    }
+
+    @Test
+    public void setPrivateStaticVolatileField() {
+        FieldReflection.setFieldValue(getField(FakeClass.class, "privateStaticVolatileField", false), null, 1);
+        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass.class, "privateStaticVolatileField", false), null));
     }
 
     @Test

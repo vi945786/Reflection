@@ -20,7 +20,7 @@ public class MethodReflection {
     public static Object useMethod(Method m, Object instance, Object ... args) {
         try {
             if(args.length == m.getParameterCount()) {
-                boolean isOverride = override.getBoolean(m);
+                boolean isOverride = overrideField.getBoolean(m);
 
                 if(!isOverride) {
                     forceAccessible(m, true);
@@ -67,8 +67,8 @@ public class MethodReflection {
             List<Method> methods = new ArrayList<>();
 
             while (clazz != null) {
-                for (Method method : (Method[]) getDeclaredMethods0.invoke(clazz, false)) {
-                    methods.add((Method) copyMethod.invoke(method));
+                for (Method method : (Method[]) getDeclaredMethods0Method.invoke(clazz, false)) {
+                    methods.add((Method) copyMethodMethod.invoke(method));
                 }
                 if(includeInheritedFields) {
                     clazz = clazz.getSuperclass();

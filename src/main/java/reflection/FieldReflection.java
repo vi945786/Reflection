@@ -17,10 +17,21 @@ public class FieldReflection {
     public static void setFieldValue(Field f, Object instance, Object value) {
         try {
             Object currentOverrideFieldAccessor = overrideFieldAccessorField.get(f);
+            if (currentOverrideFieldAccessor == null || setterField.get(currentOverrideFieldAccessor) == null) {
+                Object newOverrideFieldAccessor = newFieldAccessorMethod.invoke(reflectionFactory, f, true);
 
-            forceWritable(f, null);
+                if (setterField.get(newOverrideFieldAccessor) == null) {
+                    int fieldFlags = fieldFlagsField.getInt(newOverrideFieldAccessor);
+                    if (fieldFlags % 2 == 1) {
+                        fieldFlagsField.set(newOverrideFieldAccessor, fieldFlags - 1);
+                    }
 
-            boolean isOverride = override.getBoolean(f);
+                    setterField.set(newOverrideFieldAccessor, makeMethod.invoke(null, f.getDeclaringClass(), memberNameConstructor.newInstance(f, true)));
+                    overrideFieldAccessorField.set(f, newOverrideFieldAccessor);
+                }
+            }
+
+            boolean isOverride = overrideField.getBoolean(f);
 
             if(!isOverride) {
                 forceAccessible(f, true);
@@ -32,10 +43,8 @@ public class FieldReflection {
                 forceAccessible(f, false);
             }
 
-            forceWritable(f, currentOverrideFieldAccessor);
-
             overrideFieldAccessorField.set(f, currentOverrideFieldAccessor);
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             e.printStackTrace();
         }
     }
@@ -48,13 +57,7 @@ public class FieldReflection {
      */
     public static Object getFieldValue(Field f, Object instance) {
         try {
-            if(Modifier.isStatic(f.getModifiers()) && instance != null) {
-                instance = null;
-            } else if(!Modifier.isStatic(f.getModifiers()) && instance == null) {
-                throw new NullPointerException("instance can't be null if field isn't static");
-            }
-
-            boolean isOverride = override.getBoolean(f);
+            boolean isOverride = overrideField.getBoolean(f);
 
             if(!isOverride) {
                 forceAccessible(f, true);
@@ -100,8 +103,8 @@ public class FieldReflection {
             List<Field> fields = new ArrayList<>();
 
             while (clazz != null) {
-                for (Field field : (Field[]) getDeclaredFields0.invoke(clazz, false)) {
-                    fields.add((Field) copyField.invoke(field));
+                for (Field field : (Field[]) getDeclaredFields0Method.invoke(clazz, false)) {
+                    fields.add((Field) copyFieldMethod.invoke(field));
                 }
                 if(includeInheritedFields) {
                     clazz = clazz.getSuperclass();
