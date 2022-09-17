@@ -3,7 +3,6 @@ package vars;
 public class FakeClass {
     private final int privateFinalField;
     private volatile int privateVolatileField;
-    private static volatile int privateStaticVolatileField;
     private static final int privateStaticFinalField = 0;
     private static int privateStaticField;
     private static final int privateStaticFinalFieldSuperclass = 0;
@@ -52,4 +51,7 @@ public class FakeClass {
     private static void privateStaticMethodSuperclass(int i) {
         wasStaticMethodUsedWithSuperclass = true;
     }
+
+    class InnerClass {}
+    static class StaticInnerClass {}
 }

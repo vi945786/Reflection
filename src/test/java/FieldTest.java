@@ -35,12 +35,6 @@ public class FieldTest {
     }
 
     @Test
-    public void setPrivateStaticVolatileField() {
-        FieldReflection.setFieldValue(getField(FakeClass.class, "privateStaticVolatileField", false), null, 1);
-        assertEquals(1, FieldReflection.getFieldValue(getField(FakeClass.class, "privateStaticVolatileField", false), null));
-    }
-
-    @Test
     public void setPrivateFinalFieldSuperclass() {
         FakeClass2 fakeClass2 = new FakeClass2();
 
