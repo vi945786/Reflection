@@ -54,10 +54,6 @@ public class Vars {
     //ClassLoader.class
     public static Field classesField;
 
-    //not class
-    public static File bootstrapFileDir;
-    public static Class<?>[] bootstrapClasses;
-
     static {
         try {
             {
@@ -114,25 +110,6 @@ public class Vars {
 
             {
                 classesField = forceAccessible(((Field[]) getDeclaredFields0Method.invoke(ClassLoader.class, false))[7], true);
-            }
-
-            {
-                bootstrapFileDir = new File(System.getProperty("sun.boot.library.path").substring(0, System.getProperty("sun.boot.library.path").lastIndexOf("\\")) + "\\jmods");
-                {
-                    Set<Class<?>> classes = new HashSet<>();
-                    File[] files = bootstrapFileDir.listFiles();
-
-                    for (int i = 0; i < files.length; i++) {
-                        File file = files[i];
-
-                        ZipFile zipFile = new ZipFile(file.getPath());
-                        Enumeration<? extends ZipEntry> entries = zipFile.entries();
-
-                        classes.addAll(Collections.list(entries).stream().filter(n -> n.getName().endsWith(".class") && !n.getName().contains("module-info")).map(ZipEntry::getName).map(n -> getClassByName(n.substring(0, n.lastIndexOf("/")).replace("/", ".").replace("classes.", ""), n.substring(n.lastIndexOf("/") + 1, n.length() - 6))).toList());
-                        classes.removeAll(Collections.singleton(null));
-                    }
-                    bootstrapClasses = classes.toArray(Class[]::new);
-                }
             }
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchFieldException | IOException e) {
             e.printStackTrace();
