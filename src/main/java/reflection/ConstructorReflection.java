@@ -65,7 +65,7 @@ public class ConstructorReflection {
                 constructors.add((Constructor<T>) copyConstructorMethod.invoke(constructor));
             }
 
-            return constructors.toArray(Constructor[]::new);
+            return constructors.toArray(new Constructor[0]);
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }

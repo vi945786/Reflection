@@ -1,14 +1,9 @@
 package reflection;
 
 import sun.misc.Unsafe;
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.*;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import static reflection.ClassReflection.*;
-import static reflection.Utils.forceAccessible;
+import static reflection.FieldReflection.getField;
+import static reflection.Utils.*;
 
 public class Vars {
 
@@ -16,9 +11,9 @@ public class Vars {
     public static Unsafe unsafe;
 
     //Class.class
+    public static Method getDeclaredMethods0Method; //gets all constructors
     public static Method getDeclaredConstructors0Method; //gets all constructors
     public static Method getDeclaredFields0Method; //gets all fields
-    public static Method getDeclaredMethods0Method; //gets all constructors
     public static Method getDeclaredClasses0Method; //gets all inner Classes
 
     //Constructor.class
@@ -27,6 +22,7 @@ public class Vars {
     //Field.class
     public static Method copyFieldMethod; //adds root
     public static Field overrideFieldAccessorField;
+    public static Field fieldAccessorField;
     public static Field overrideField;
     public static Field trustedFinalField;
     public static Field rootField;
@@ -54,9 +50,9 @@ public class Vars {
     //other
     public static int javaVersion;
 
-    //java 18 or more only
-    //FieldAccessor.class
-    public static Class<?> fieldAccessorClass;
+    //java 18 and later
+    //MethodHandleFieldAccessorImpl.class
+    public static Class<?> methodHandleFieldAccessorImplClass;
     public static Field fieldFlagsField;
     public static Field setterField;
 
@@ -71,9 +67,9 @@ public class Vars {
             }
 
             {
+                getDeclaredMethods0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredMethods0", boolean.class), true);
                 getDeclaredConstructors0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredConstructors0", boolean.class), true);
                 getDeclaredFields0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class), true);
-                getDeclaredMethods0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredMethods0", boolean.class), true);
                 getDeclaredClasses0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredClasses0"), true);
             }
 
@@ -83,10 +79,10 @@ public class Vars {
 
             {
                 copyFieldMethod = forceAccessible(Field.class.getDeclaredMethod("copy"), true);
-                overrideFieldAccessorField = forceAccessible((Field) copyFieldMethod.invoke(((Field[]) getDeclaredFields0Method.invoke(Field.class, false))[10]), true);
-                overrideField = forceAccessible(((Field[]) getDeclaredFields0Method.invoke(AccessibleObject.class, false))[0], true);
-                trustedFinalField = forceAccessible(((Field[]) getDeclaredFields0Method.invoke(Field.class, false))[5], true);
-                rootField = forceAccessible(((Field[]) getDeclaredFields0Method.invoke(Field.class, false))[11], true);
+                overrideFieldAccessorField = forceAccessible(getField(Field.class, "overrideFieldAccessor", false), true);
+                fieldAccessorField = forceAccessible(getField(Field.class, "fieldAccessor", false), true);
+                overrideField = forceAccessible(getField(AccessibleObject.class, "override", false), true);
+                rootField = forceAccessible(getField(Field.class, "root", false), true);
             }
 
             {
@@ -111,7 +107,7 @@ public class Vars {
             }
 
             {
-                classesField = forceAccessible(((Field[]) getDeclaredFields0Method.invoke(ClassLoader.class, false))[7], true);
+                classesField = forceAccessible((Field) copyFieldMethod.invoke(((Field[]) getDeclaredFields0Method.invoke(ClassLoader.class, false))[7]), true);
             }
 
             {
@@ -119,10 +115,12 @@ public class Vars {
             }
 
             if(javaVersion >= 18) {
-                fieldAccessorClass = Class.forName("jdk.internal.reflect.MethodHandleFieldAccessorImpl");
-                fieldFlagsField = forceAccessible(fieldAccessorClass.getDeclaredField("fieldFlags"), true);
-                setterField = forceAccessible(fieldAccessorClass.getDeclaredField("setter"), true);
+                methodHandleFieldAccessorImplClass = Class.forName("jdk.internal.reflect.MethodHandleFieldAccessorImpl");
+                fieldFlagsField = forceAccessible(methodHandleFieldAccessorImplClass.getDeclaredField("fieldFlags"), true);
+                setterField = forceAccessible(methodHandleFieldAccessorImplClass.getDeclaredField("setter"), true);
             }
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchFieldException e) {}
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
     }
 }

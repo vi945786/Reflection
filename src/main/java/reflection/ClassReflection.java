@@ -40,6 +40,6 @@ public class ClassReflection {
      * @return the classes implementing an interface or extending a class
      */
     public static Class<?>[] filterClassesAssignableFrom(Class<?> implementingOrExtending, Class<?> ... classes) {
-        return Arrays.stream(classes).filter(c -> implementingOrExtending.isAssignableFrom(c)).toArray(Class[]::new);
+        return Arrays.stream(classes).filter(implementingOrExtending::isAssignableFrom).toArray(Class[]::new);
     }
 }

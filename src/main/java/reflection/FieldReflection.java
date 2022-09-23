@@ -16,38 +16,9 @@ public class FieldReflection {
      */
     public static void setFieldValue(Field f, Object instance, Object value) {
         try {
-            Object currentOverrideFieldAccessor = overrideFieldAccessorField.get(f);
-            if(javaVersion < 18) {
-                Field root = (Field) rootField.get(f);
-                if(root == null) {
-                    root = f;
-                }
+            Object oldOverrideFieldAccessor = overrideFieldAccessorField.get(f);
 
-                boolean isFinal = Modifier.isFinal(root.getModifiers());
-                if(isFinal) {
-                    changeModifiers(root, ~Modifier.FINAL);
-                }
-
-                overrideFieldAccessorField.set(f, newFieldAccessorMethod.invoke(reflectionFactory, root, true));
-
-                if(isFinal) {
-                    changeModifiers(root, Modifier.FINAL);
-                }
-            } else {
-                if (currentOverrideFieldAccessor == null || setterField.get(currentOverrideFieldAccessor) == null) {
-                    Object newOverrideFieldAccessor = newFieldAccessorMethod.invoke(reflectionFactory, f, true);
-
-                    if (setterField.get(newOverrideFieldAccessor) == null) {
-                        int fieldFlags = fieldFlagsField.getInt(newOverrideFieldAccessor);
-                        if (fieldFlags % 2 == 1) {
-                            fieldFlagsField.set(newOverrideFieldAccessor, fieldFlags - 1);
-                        }
-
-                        setterField.set(newOverrideFieldAccessor, makeMethod.invoke(null, f.getDeclaringClass(), memberNameConstructor.newInstance(f, true)));
-                        overrideFieldAccessorField.set(f, newOverrideFieldAccessor);
-                    }
-                }
-            }
+            makeFieldWritable(f, null, true);
 
             boolean isOverride = overrideField.getBoolean(f);
 
@@ -61,8 +32,8 @@ public class FieldReflection {
                 forceAccessible(f, false);
             }
 
-            overrideFieldAccessorField.set(f, currentOverrideFieldAccessor);
-        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            makeFieldWritable(f, oldOverrideFieldAccessor, true);
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -131,7 +102,7 @@ public class FieldReflection {
                 }
             }
 
-            return fields.toArray(Field[]::new);
+            return fields.toArray(new Field[0]);
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
