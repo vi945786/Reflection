@@ -4,6 +4,8 @@
 
 ### ... and this library makes it suck a little less.
 
+supports java 16, 17, 18 and 19
+
 Including:
 
 1. Helper methods to get Fields, Methods and Constructors.
