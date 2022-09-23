@@ -111,7 +111,7 @@ public class Vars {
             {
                 classesField = forceAccessible(((Field[]) getDeclaredFields0Method.invoke(ClassLoader.class, false))[7], true);
             }
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchFieldException | IOException e) {
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchFieldException e) {
             e.printStackTrace();
         }
     }

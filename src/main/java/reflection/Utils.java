@@ -26,7 +26,7 @@ public class Utils {
      * @param modifierList modifiers to change to
      * @return object with changed modifier
      */
-    public static Object changeModifiers(AccessibleObject o, int ... modifierList) {
+    public static <T extends AccessibleObject> T changeModifiers(T o, int ... modifierList) {
         try {
             if(modifierList.length != 0) {
                 Field f = getField(o.getClass(), "modifiers", false);
@@ -58,6 +58,16 @@ public class Utils {
             e.printStackTrace();
         }
         return o;
+    }
+
+    /**
+     * casts value to type
+     * @param clazz type to cast to
+     * @param value value to cast
+     * @return value as type
+     */
+    public static <T> T cast(Class<T> clazz, Object value) {
+        return clazz.cast(value);
     }
 
     /**
