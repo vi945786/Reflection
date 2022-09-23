@@ -1,5 +1,5 @@
 import org.junit.jupiter.api.Test;
-import sun.misc.Unsafe;
+import reflection.Vars;
 import vars.TestVar;
 import vars.TestVar2;
 import java.lang.reflect.Field;
@@ -65,10 +65,19 @@ public class MethodTest {
 
     @Test
     public void getUnusable() {
-        Object o = getFieldValue(getField(Unsafe.class, "theInternalUnsafe", false), null);
-        Field f = getField(TestVar.class, "privateFinalField", false);
-        Method m = getMethod(o.getClass(), "objectFieldOffset0", false, Field.class);
-        assertDoesNotThrow(() -> useMethod(m, o, f));
-        assertNotNull(useMethod(m, o, f));
+        if(Vars.javaVersion < 9) {
+            try {
+                assertEquals(getFieldValue(Class.forName("jdk.internal.org.objectweb.asm.Type").getField("BYTE_TYPE"), null), useMethod(Class.forName("jdk.internal.org.objectweb.asm.Type").getDeclaredMethod("getType", String.class), null, "B"));
+            } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            Object o = getFieldValue(getField(Vars.unsafeClass, "theInternalUnsafe", false), null);
+            Field f = getField(TestVar.class, "privateFinalField", false);
+            Method m = getMethod(o.getClass(), "objectFieldOffset0", false, Field.class);
+            assertDoesNotThrow(() -> useMethod(m, o, f));
+            assertNotNull(useMethod(m, o, f));
+        }
     }
 }

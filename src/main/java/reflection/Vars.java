@@ -1,14 +1,19 @@
 package reflection;
 
-import sun.misc.Unsafe;
 import java.lang.reflect.*;
 import static reflection.FieldReflection.getField;
 import static reflection.Utils.*;
 
 public class Vars {
 
+    //other
+    public static int javaVersion;
+
     //Unsafe.class
-    public static Unsafe unsafe;
+    public static Class<?> unsafeClass;
+    public static Object unsafe;
+    public static Method putBooleanMethod;
+    public static Method getByteMethod;
 
     //Class.class
     public static Method getDeclaredMethods0Method; //gets all constructors
@@ -24,7 +29,6 @@ public class Vars {
     public static Field overrideFieldAccessorField;
     public static Field fieldAccessorField;
     public static Field overrideField;
-    public static Field trustedFinalField;
     public static Field rootField;
 
     //Method.class
@@ -44,12 +48,6 @@ public class Vars {
     public static Class<?> directMethodHandleClass;
     public static Method makeMethod; //makes new instance
 
-    //ClassLoader.class
-    public static Field classesField;
-
-    //other
-    public static int javaVersion;
-
     //java 18 and later
     //MethodHandleFieldAccessorImpl.class
     public static Class<?> methodHandleFieldAccessorImplClass;
@@ -58,11 +56,24 @@ public class Vars {
 
     static {
         try {
+
+            {
+                javaVersion = Integer.parseInt(System.getProperties().getProperty("java.specification.version").replace("1.", ""));
+            }
+
             {
                 {
-                    Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-                    unsafeField.setAccessible(true);
-                    unsafe = (Unsafe) unsafeField.get(null);
+                    unsafeClass = Class.forName("sun.misc.Unsafe");
+                    {
+                        Field unsafeField = unsafeClass.getDeclaredField("theUnsafe");
+                        unsafeField.setAccessible(true);
+                        unsafe = unsafeField.get(null);
+                    }
+                    {
+                        putBooleanMethod = unsafeClass.getDeclaredMethod("putBoolean", Object.class, long.class, boolean.class);
+                        putBooleanMethod.setAccessible(true);
+                    }
+                    getByteMethod = forceAccessible(unsafeClass.getDeclaredMethod("getByte", long.class), true);
                 }
             }
 
@@ -90,7 +101,7 @@ public class Vars {
             }
 
             {
-                reflectionFactoryClass = Class.forName("jdk.internal.reflect.ReflectionFactory");
+                reflectionFactoryClass = Class.forName((javaVersion < 9 ? "sun" : "jdk.internal") + ".reflect.ReflectionFactory");
                 getReflectionFactoryMethod = forceAccessible(reflectionFactoryClass.getDeclaredMethod("getReflectionFactory"), true);
                 reflectionFactory = getReflectionFactoryMethod.invoke(null);
                 newFieldAccessorMethod = forceAccessible(reflectionFactoryClass.getDeclaredMethod("newFieldAccessor", Field.class, boolean.class), true);
@@ -104,14 +115,6 @@ public class Vars {
             {
                 directMethodHandleClass = Class.forName("java.lang.invoke.DirectMethodHandle");
                 makeMethod = forceAccessible(directMethodHandleClass.getDeclaredMethod("make", Class.class, memberNameClass), true);
-            }
-
-            {
-                classesField = forceAccessible((Field) copyFieldMethod.invoke(((Field[]) getDeclaredFields0Method.invoke(ClassLoader.class, false))[7]), true);
-            }
-
-            {
-                javaVersion = Integer.parseInt(System.getProperties().getProperty("java.specification.version"));
             }
 
             if(javaVersion >= 18) {

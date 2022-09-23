@@ -13,7 +13,11 @@ public class Utils {
      * @return the same object that was passed in but accessible
      */
     public static <T extends AccessibleObject> T forceAccessible(T o, boolean accessible) {
-        unsafe.putBoolean(o, 12, accessible);
+        try {
+            putBooleanMethod.invoke(unsafe, o, 12, accessible);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
         return o;
     }
 
@@ -128,6 +132,10 @@ public class Utils {
      * don't use this it actually works
      */
     public static void crashJVM() {
-        unsafe.getByte(0);
+        try {
+            getByteMethod.invoke(unsafe, 0);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 }
