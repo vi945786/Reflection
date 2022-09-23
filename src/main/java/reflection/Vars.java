@@ -54,7 +54,7 @@ public class Vars {
     //other
     public static int javaVersion;
 
-    //java 18 only
+    //java 18 or more only
     //FieldAccessor.class
     public static Class<?> fieldAccessorClass;
     public static Field fieldFlagsField;
@@ -118,7 +118,7 @@ public class Vars {
                 javaVersion = Integer.parseInt(System.getProperties().getProperty("java.specification.version"));
             }
 
-            if(javaVersion == 18) {
+            if(javaVersion >= 18) {
                 fieldAccessorClass = Class.forName("jdk.internal.reflect.MethodHandleFieldAccessorImpl");
                 fieldFlagsField = forceAccessible(fieldAccessorClass.getDeclaredField("fieldFlags"), true);
                 setterField = forceAccessible(fieldAccessorClass.getDeclaredField("setter"), true);
