@@ -28,14 +28,11 @@ public class Vars {
     public static Method copyFieldMethod; //adds root
     public static Field overrideFieldAccessorField;
     public static Field overrideField;
+    public static Field trustedFinalField;
+    public static Field rootField;
 
     //Method.class
     public static Method copyMethodMethod; //adds root
-
-    //FieldAccessor.class
-    public static Class<?> fieldAccessorClass;
-    public static Field fieldFlagsField;
-    public static Field setterField;
 
     //ReflectionFactory.class
     public static Class<?> reflectionFactoryClass;
@@ -53,6 +50,15 @@ public class Vars {
 
     //ClassLoader.class
     public static Field classesField;
+
+    //other
+    public static int javaVersion;
+
+    //java 18 only
+    //FieldAccessor.class
+    public static Class<?> fieldAccessorClass;
+    public static Field fieldFlagsField;
+    public static Field setterField;
 
     static {
         try {
@@ -79,16 +85,12 @@ public class Vars {
                 copyFieldMethod = forceAccessible(Field.class.getDeclaredMethod("copy"), true);
                 overrideFieldAccessorField = forceAccessible((Field) copyFieldMethod.invoke(((Field[]) getDeclaredFields0Method.invoke(Field.class, false))[10]), true);
                 overrideField = forceAccessible(((Field[]) getDeclaredFields0Method.invoke(AccessibleObject.class, false))[0], true);
+                trustedFinalField = forceAccessible(((Field[]) getDeclaredFields0Method.invoke(Field.class, false))[5], true);
+                rootField = forceAccessible(((Field[]) getDeclaredFields0Method.invoke(Field.class, false))[11], true);
             }
 
             {
                 copyMethodMethod = forceAccessible(Method.class.getDeclaredMethod("copy"), true);
-            }
-
-            {
-                fieldAccessorClass = Class.forName("jdk.internal.reflect.MethodHandleFieldAccessorImpl");
-                fieldFlagsField = forceAccessible(fieldAccessorClass.getDeclaredField("fieldFlags"), true);
-                setterField = forceAccessible(fieldAccessorClass.getDeclaredField("setter"), true);
             }
 
             {
@@ -111,8 +113,16 @@ public class Vars {
             {
                 classesField = forceAccessible(((Field[]) getDeclaredFields0Method.invoke(ClassLoader.class, false))[7], true);
             }
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchFieldException e) {
-            e.printStackTrace();
-        }
+
+            {
+                javaVersion = Integer.parseInt(System.getProperties().getProperty("java.specification.version"));
+            }
+
+            if(javaVersion == 18) {
+                fieldAccessorClass = Class.forName("jdk.internal.reflect.MethodHandleFieldAccessorImpl");
+                fieldFlagsField = forceAccessible(fieldAccessorClass.getDeclaredField("fieldFlags"), true);
+                setterField = forceAccessible(fieldAccessorClass.getDeclaredField("setter"), true);
+            }
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchFieldException e) {}
     }
 }

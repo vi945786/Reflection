@@ -17,17 +17,38 @@ public class FieldReflection {
     public static void setFieldValue(Field f, Object instance, Object value) {
         try {
             Object currentOverrideFieldAccessor = overrideFieldAccessorField.get(f);
-            if (currentOverrideFieldAccessor == null || setterField.get(currentOverrideFieldAccessor) == null) {
-                Object newOverrideFieldAccessor = newFieldAccessorMethod.invoke(reflectionFactory, f, true);
+            switch (javaVersion) {
+                case 18 -> {
+                    if (currentOverrideFieldAccessor == null || setterField.get(currentOverrideFieldAccessor) == null) {
+                        Object newOverrideFieldAccessor = newFieldAccessorMethod.invoke(reflectionFactory, f, true);
 
-                if (setterField.get(newOverrideFieldAccessor) == null) {
-                    int fieldFlags = fieldFlagsField.getInt(newOverrideFieldAccessor);
-                    if (fieldFlags % 2 == 1) {
-                        fieldFlagsField.set(newOverrideFieldAccessor, fieldFlags - 1);
+                        if (setterField.get(newOverrideFieldAccessor) == null) {
+                            int fieldFlags = fieldFlagsField.getInt(newOverrideFieldAccessor);
+                            if (fieldFlags % 2 == 1) {
+                                fieldFlagsField.set(newOverrideFieldAccessor, fieldFlags - 1);
+                            }
+
+                            setterField.set(newOverrideFieldAccessor, makeMethod.invoke(null, f.getDeclaringClass(), memberNameConstructor.newInstance(f, true)));
+                            overrideFieldAccessorField.set(f, newOverrideFieldAccessor);
+                        }
+                    }
+                }
+                case 17 -> {
+                    Field root = (Field) rootField.get(f);
+                    if(root == null) {
+                        root = f;
                     }
 
-                    setterField.set(newOverrideFieldAccessor, makeMethod.invoke(null, f.getDeclaringClass(), memberNameConstructor.newInstance(f, true)));
-                    overrideFieldAccessorField.set(f, newOverrideFieldAccessor);
+                    boolean isFinal = Modifier.isFinal(root.getModifiers());
+                    if(isFinal) {
+                        changeModifiers(root, ~Modifier.FINAL);
+                    }
+
+                    overrideFieldAccessorField.set(f, newFieldAccessorMethod.invoke(reflectionFactory, root, true));
+
+                    if(isFinal) {
+                        changeModifiers(root, Modifier.FINAL);
+                    }
                 }
             }
 
