@@ -15,7 +15,9 @@ public class ClassReflection {
     public static Class<?> getClassByName(String packageName, String name) {
         try {
             return Class.forName(packageName + (packageName.equals("") ? "" : '.') + name, false, ClassReflection.class.getClassLoader());
-        } catch (Throwable e) {}
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         return null;
     }
 

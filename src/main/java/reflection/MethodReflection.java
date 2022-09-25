@@ -1,6 +1,5 @@
 package reflection;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -82,6 +81,6 @@ public class MethodReflection {
         } catch (InvocationTargetException | IllegalAccessException | IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
-        return null;
+        return new Method[0];
     }
 }

@@ -106,6 +106,6 @@ public class FieldReflection {
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        return null;
+        return new Field[0];
     }
 }
