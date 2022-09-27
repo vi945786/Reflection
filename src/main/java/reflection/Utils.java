@@ -22,63 +22,6 @@ public class Utils {
     }
 
     /**
-     * makes a trusted final field writable
-     * @param f the field
-     * @param fieldAccessor if you want to make the field writable keep this null
-     * @param isOverrideFieldAccessor if to set the overrideFieldAccessor or fieldAccessor
-     * @return the field with a new field accessor
-     */
-    public static Field makeFieldWritable(Field f, Object fieldAccessor, boolean isOverrideFieldAccessor) {
-        try {
-            Field fieldAccessorField = isOverrideFieldAccessor ? overrideFieldAccessorField : Vars.fieldAccessorField;
-
-            if(fieldAccessor == null) {
-                if (javaVersion < 18) {
-                    Field root = (Field) rootField.get(f);
-                    if (root == null) {
-                        root = f;
-                    }
-
-                    boolean isFinal = Modifier.isFinal(root.getModifiers());
-
-                    if (isFinal) {
-                        changeModifiers(root, ~Modifier.FINAL);
-                    }
-
-                    fieldAccessorField.set(f, newFieldAccessorMethod.invoke(reflectionFactory, root, true));
-
-                    if (isFinal) {
-                        changeModifiers(root, Modifier.FINAL);
-                    }
-
-                } else {
-                    Object currentOverrideFieldAccessor = fieldAccessorField.get(f);
-                    if (currentOverrideFieldAccessor == null || setterField.get(currentOverrideFieldAccessor) == null) {
-                        Object newOverrideFieldAccessor = newFieldAccessorMethod.invoke(reflectionFactory, f, true);
-
-                        if (setterField.get(newOverrideFieldAccessor) == null) {
-                            int fieldFlags = fieldFlagsField.getInt(newOverrideFieldAccessor);
-                            if (fieldFlags % 2 == 1) {
-                                fieldFlagsField.set(newOverrideFieldAccessor, fieldFlags - 1);
-                            }
-
-                            setterField.set(newOverrideFieldAccessor, makeMethod.invoke(null, f.getDeclaringClass(), memberNameConstructor.newInstance(f, true)));
-                            fieldAccessorField.set(f, newOverrideFieldAccessor);
-                        }
-                    }
-                }
-            } else {
-                if(newFieldAccessorMethod.invoke(reflectionFactory, f, true).getClass().equals(fieldAccessor.getClass())) {
-                    fieldAccessorField.set(f, fieldAccessor);
-                }
-            }
-        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            e.printStackTrace();
-        }
-        return f;
-   }
-
-    /**
      * change modifiers of object
      * @param o object to change modifiers of
      * @param modifierList modifiers to change to

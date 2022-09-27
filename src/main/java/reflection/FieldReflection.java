@@ -9,22 +9,20 @@ import static reflection.Vars.*;
 public class FieldReflection {
 
     /**
-     * sets field's value
+     * sets field's value (doesn't work with a trusted final field)
      * @param f field to change
      * @param instance instance to change the field in (null if field is static)
      * @param value the value to change the field to
      */
     public static void setFieldValue(Field f, Object instance, Object value) {
         try {
-            Object oldOverrideFieldAccessor = overrideFieldAccessorField.get(f);
-
-            makeFieldWritable(f, null, true);
-
             boolean isOverride = overrideField.getBoolean(f);
 
             if(!isOverride) {
                 forceAccessible(f, true);
             }
+
+            Utils.changeModifiers(f, ~Modifier.PUBLIC, Modifier.PRIVATE);
 
             f.set(instance, value);
 
@@ -32,7 +30,6 @@ public class FieldReflection {
                 forceAccessible(f, false);
             }
 
-            makeFieldWritable(f, oldOverrideFieldAccessor, true);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }

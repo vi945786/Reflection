@@ -3,21 +3,16 @@ import reflection.FieldReflection;
 import vars.TestVar;
 import vars.TestVar2;
 import static org.junit.jupiter.api.Assertions.*;
-import static reflection.FieldReflection.getField;
+import static reflection.FieldReflection.*;
 
 public class FieldTest {
+
     @Test
-    public void setPrivateFinalField() {
+    public void setPublicFinalField() {
         TestVar testVar = new TestVar("");
 
-        FieldReflection.setFieldValue(getField(TestVar.class, "privateFinalField", false), testVar, 1);
-        assertEquals(1, FieldReflection.getFieldValue(getField(TestVar.class, "privateFinalField", false), testVar));
-    }
-
-    @Test
-    public void setPrivateStaticFinalField() {
-        FieldReflection.setFieldValue(getField(TestVar.class, "privateStaticFinalField", false), null, 1);
-        assertEquals(1, FieldReflection.getFieldValue(getField(TestVar.class, "privateStaticFinalField", false), null));
+        FieldReflection.setFieldValue(getField(TestVar.class, "publicFinalField", false), testVar, 1);
+        assertEquals(1, testVar.publicFinalField);
     }
 
     @Test
@@ -35,16 +30,10 @@ public class FieldTest {
     }
 
     @Test
-    public void setPrivateFinalFieldSuperclass() {
-        TestVar2 fakeClass2 = new TestVar2();
+    public void setPublicFinalFieldSuperclass() {
+        TestVar2 testVar2 = new TestVar2();
 
-        FieldReflection.setFieldValue(getField(TestVar2.class, "privateFinalField", true), fakeClass2, 1);
-        assertEquals(1, FieldReflection.getFieldValue(getField(TestVar2.class, "privateFinalField", true), fakeClass2));
-    }
-
-    @Test
-    public void setPrivateStaticFinalFieldSuperclass() {
-        FieldReflection.setFieldValue(getField(TestVar2.class, "privateStaticFinalFieldSuperclass", true), null, 1);
-        assertEquals(1, FieldReflection.getFieldValue(getField(TestVar2.class, "privateStaticFinalFieldSuperclass", true), null));
+        FieldReflection.setFieldValue(getField(TestVar2.class, "publicFinalField", true), testVar2, 1);
+        assertEquals(1, testVar2.publicFinalField);
     }
 }

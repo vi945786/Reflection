@@ -74,7 +74,7 @@ public class MethodTest {
 
         } else {
             Object o = getFieldValue(getField(Vars.unsafeClass, "theInternalUnsafe", false), null);
-            Field f = getField(TestVar.class, "privateFinalField", false);
+            Field f = getField(TestVar.class, "publicFinalField", false);
             Method m = getMethod(o.getClass(), "objectFieldOffset0", false, Field.class);
             assertDoesNotThrow(() -> useMethod(m, o, f));
             assertNotNull(useMethod(m, o, f));

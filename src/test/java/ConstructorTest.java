@@ -8,19 +8,19 @@ import static reflection.FieldReflection.*;
 public class ConstructorTest {
     @Test
     public void getPrivateConstructorInt() {
-        TestVar testVar = (TestVar) useConstructor(getConstructor(TestVar.class, int.class), 1);
-        assertEquals(1, getFieldValue(getField(TestVar.class, "privateFinalField", false), testVar));
+        TestVar testVar = useConstructor(getConstructor(TestVar.class, int.class), 1);
+        assertEquals(1, testVar.publicFinalField);
     }
 
     @Test
     public void getPrivateConstructorInteger() {
-        TestVar testVar = (TestVar) useConstructor(getConstructor(TestVar.class, Integer.class), Integer.valueOf(1));
-        assertEquals(1, getFieldValue(getField(TestVar.class, "privateFinalField", false), testVar));
+        TestVar testVar = useConstructor(getConstructor(TestVar.class, Integer.class), Integer.valueOf(1));
+        assertEquals(1, testVar.publicFinalField);
     }
 
     @Test
     public void getPrivateConstructor() {
-        TestVar testVar = (TestVar) useConstructor(getConstructor(TestVar.class));
-        assertEquals(1, getFieldValue(getField(TestVar.class, "privateFinalField", false), testVar));
+        TestVar testVar = useConstructor(getConstructor(TestVar.class));
+        assertEquals(1, testVar.publicFinalField);
     }
 }
