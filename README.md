@@ -4,7 +4,7 @@
 
 ### ... and this library makes it suck a little less.
 
-supports java 8 to 19
+supports java 9 to 19
 
 Including:
 

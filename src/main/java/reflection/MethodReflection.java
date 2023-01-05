@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import static reflection.Utils.forceAccessible;
+import static reflection.Utils.isAccessible;
 import static reflection.Vars.*;
 
 public class MethodReflection {
@@ -20,23 +21,24 @@ public class MethodReflection {
     public static Object useMethod(Method m, Object instance, Object ... args) {
         try {
             if(args.length == m.getParameterCount()) {
-                boolean isOverride = overrideField.getBoolean(m);
+                boolean isOverride = isAccessible(m);
 
-                if(!isOverride) {
-                    forceAccessible(m, true);
-                }
+                forceAccessible(m, true);
 
                 Object value = m.invoke(instance ,args);
 
-                if(!isOverride) {
-                    forceAccessible(m, false);
-                }
+                forceAccessible(m, isOverride);
+
                 return value;
             }
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Method getMethod(Class<?> clazz, String name, Class<?> ... classes) {
+        return getMethod(clazz, name, false, classes);
     }
 
     /**

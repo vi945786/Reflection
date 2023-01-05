@@ -1,11 +1,17 @@
 import org.junit.jupiter.api.Test;
 import vars.TestVar;
 import static org.junit.jupiter.api.Assertions.*;
-import static reflection.ConstructorReflection.getConstructor;
-import static reflection.ConstructorReflection.useConstructor;
+import static reflection.ConstructorReflection.*;
 import static reflection.FieldReflection.*;
 
 public class ConstructorTest {
+
+    @Test
+    public void noConstructor() {
+        TestVar testVar = createInstanceWithoutConstructor(TestVar.class);
+        assertEquals(0, testVar.publicFinalField);
+    }
+
     @Test
     public void getPrivateConstructorInt() {
         TestVar testVar = useConstructor(getConstructor(TestVar.class, int.class), 1);

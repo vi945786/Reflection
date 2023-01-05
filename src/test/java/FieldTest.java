@@ -11,22 +11,22 @@ public class FieldTest {
     public void setPublicFinalField() {
         TestVar testVar = new TestVar("");
 
-        FieldReflection.setFieldValue(getField(TestVar.class, "publicFinalField", false), testVar, 1);
+        FieldReflection.setFieldValue(getField(TestVar.class, "publicFinalField"), testVar, 1);
         assertEquals(1, testVar.publicFinalField);
     }
 
     @Test
     public void setPrivateStaticField() {
-        FieldReflection.setFieldValue(getField(TestVar.class, "privateStaticField", false), null, 1);
-        assertEquals(1, FieldReflection.getFieldValue(getField(TestVar.class, "privateStaticField", false), null));
+        FieldReflection.setFieldValue(getField(TestVar.class, "privateStaticField"), null, 1);
+        assertEquals(1, FieldReflection.getFieldValue(getField(TestVar.class, "privateStaticField"), null));
     }
 
     @Test
     public void setPrivateVolatileField() {
         TestVar testVar = new TestVar("");
 
-        FieldReflection.setFieldValue(getField(TestVar.class, "privateVolatileField", false), testVar, 1);
-        assertEquals(1, FieldReflection.getFieldValue(getField(TestVar.class, "privateVolatileField", false), testVar));
+        FieldReflection.setFieldValue(getField(TestVar.class, "privateVolatileField"), testVar, 1);
+        assertEquals(1, FieldReflection.getFieldValue(getField(TestVar.class, "privateVolatileField"), testVar));
     }
 
     @Test

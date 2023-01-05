@@ -5,17 +5,16 @@ import java.lang.reflect.Field;
 import static org.junit.jupiter.api.Assertions.*;
 import static reflection.FieldReflection.getField;
 import static reflection.Utils.*;
-import static reflection.Vars.*;
 
 public class ForceAccessibleTest {
 
     @Test
-    public void forceAccessibleField() throws IllegalAccessException {
-        Field f = getField(Field.class, "clazz", false);
-        assertFalse(overrideField.getBoolean(f));
+    public void forceAccessibleField() {
+        Field f = getField(Field.class, "clazz");
+        assertFalse(isAccessible(f));
         forceAccessible(f, true);
-        assertTrue(overrideField.getBoolean(f));
+        assertTrue(isAccessible(f));
         forceAccessible(f, false);
-        assertFalse(overrideField.getBoolean(f));
+        assertFalse(isAccessible(f));
     }
 }

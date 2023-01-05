@@ -13,12 +13,17 @@ public class Utils {
      * @return the same object that was passed in but accessible
      */
     public static <T extends AccessibleObject> T forceAccessible(T o, boolean accessible) {
-        try {
-            putBooleanMethod.invoke(unsafe, o, 12, accessible);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        unsafe.putBoolean(o, 12, accessible);
         return o;
+    }
+
+    public static Boolean isAccessible(AccessibleObject o) {
+        try {
+            return overrideField.getBoolean(o);
+        } catch (IllegalAccessException e) {
+           e.printStackTrace();
+        }
+        throw new NullPointerException();
     }
 
     /**
@@ -30,9 +35,9 @@ public class Utils {
     public static <T extends AccessibleObject> T changeModifiers(T o, int ... modifierList) {
         try {
             if(modifierList.length != 0) {
-                Field f = getField(o.getClass(), "modifiers", false);
+                Field f = getField(o.getClass(), "modifiers");
 
-                boolean isOverride = overrideField.getBoolean(f);
+                boolean isOverride = isAccessible(f);
 
                 if(!isOverride) {
                     forceAccessible(f, true);
@@ -75,10 +80,6 @@ public class Utils {
      * don't use this it actually works
      */
     public static void crashJVM() {
-        try {
-            getByteMethod.invoke(unsafe, 0);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        unsafe.getByte(0);
     }
 }

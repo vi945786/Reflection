@@ -9,27 +9,20 @@ import static reflection.Vars.*;
 public class FieldReflection {
 
     /**
-     * sets field's value (doesn't work with a trusted final field)
+     * sets field's value (doesn't work with trusted final fields)
      * @param f field to change
      * @param instance instance to change the field in (null if field is static)
      * @param value the value to change the field to
      */
     public static void setFieldValue(Field f, Object instance, Object value) {
         try {
-            boolean isOverride = overrideField.getBoolean(f);
+            boolean isOverride = isAccessible(f);
 
-            if(!isOverride) {
-                forceAccessible(f, true);
-            }
-
-            Utils.changeModifiers(f, ~Modifier.PUBLIC, Modifier.PRIVATE);
+            forceAccessible(f, true);
 
             f.set(instance, value);
 
-            if(!isOverride) {
-                forceAccessible(f, false);
-            }
-
+            forceAccessible(f, isOverride);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -43,7 +36,7 @@ public class FieldReflection {
      */
     public static Object getFieldValue(Field f, Object instance) {
         try {
-            boolean isOverride = overrideField.getBoolean(f);
+            boolean isOverride = isAccessible(f);
 
             if(!isOverride) {
                 forceAccessible(f, true);
@@ -60,6 +53,10 @@ public class FieldReflection {
             e.printStackTrace();
         }
         throw new NullPointerException("value not found");
+    }
+
+    public static Field getField(Class<?> clazz, String name) {
+        return getField(clazz, name, false);
     }
 
     /**

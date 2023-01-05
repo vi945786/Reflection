@@ -1,84 +1,67 @@
 package reflection;
 
+import sun.misc.Unsafe;
+
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.*;
-import static reflection.FieldReflection.getField;
+import static reflection.FieldReflection.*;
+import static reflection.MethodReflection.getMethod;
 import static reflection.Utils.*;
 
 public class Vars {
 
-    //other
-    public static int javaVersion;
+    //Unsafe
+    public static Unsafe unsafe;
 
-    //Unsafe.class
-    public static Class<?> unsafeClass;
-    public static Object unsafe;
-    public static Method putBooleanMethod;
-    public static Method getByteMethod;
-
-    //Class.class
+    //Class
     public static Method getDeclaredMethods0Method; //gets all constructors
     public static Method getDeclaredConstructors0Method; //gets all constructors
     public static Method getDeclaredFields0Method; //gets all fields
     public static Method getDeclaredClasses0Method; //gets all inner Classes
 
-    //Constructor.class
+    //Constructor
     public static Method copyConstructorMethod; //adds root
 
-    //Field.class
+    //Field
     public static Method copyFieldMethod; //adds root
 
-    //AccessibleObject.class
+    //AccessibleObject
     public static Field overrideField;
 
-    //Method.class
+    //Method
     public static Method copyMethodMethod; //adds root
+
+    //ClassLoader
+    public static Method findLoadedClass0Method; //checks if a class is loaded
 
     static {
         try {
+            Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+            unsafeField.setAccessible(true);
+            unsafe = (Unsafe) unsafeField.get(null);
 
-            {
-                javaVersion = Integer.parseInt(System.getProperties().getProperty("java.specification.version").replace("1.", ""));
-            }
 
-            {
-                {
-                    unsafeClass = Class.forName("sun.misc.Unsafe");
-                    {
-                        Field unsafeField = unsafeClass.getDeclaredField("theUnsafe");
-                        unsafeField.setAccessible(true);
-                        unsafe = unsafeField.get(null);
-                    }
-                    {
-                        putBooleanMethod = unsafeClass.getDeclaredMethod("putBoolean", Object.class, long.class, boolean.class);
-                        putBooleanMethod.setAccessible(true);
-                    }
-                    getByteMethod = forceAccessible(unsafeClass.getDeclaredMethod("getByte", long.class), true);
-                }
-            }
+            getDeclaredMethods0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredMethods0", boolean.class), true);
+            getDeclaredConstructors0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredConstructors0", boolean.class), true);
+            getDeclaredFields0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class), true);
+            getDeclaredClasses0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredClasses0"), true);
 
-            {
-                getDeclaredMethods0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredMethods0", boolean.class), true);
-                getDeclaredConstructors0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredConstructors0", boolean.class), true);
-                getDeclaredFields0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class), true);
-                getDeclaredClasses0Method = forceAccessible(Class.class.getDeclaredMethod("getDeclaredClasses0"), true);
-            }
 
-            {
-                copyConstructorMethod = forceAccessible(Constructor.class.getDeclaredMethod("copy"), true);
-            }
+            copyConstructorMethod = forceAccessible(Constructor.class.getDeclaredMethod("copy"), true);
 
-            {
-                copyFieldMethod = forceAccessible(Field.class.getDeclaredMethod("copy"), true);
-            }
 
-            {
-                overrideField = forceAccessible(getField(AccessibleObject.class, "override", false), true);
-            }
+            copyFieldMethod = forceAccessible(Field.class.getDeclaredMethod("copy"), true);
 
-            {
-                copyMethodMethod = forceAccessible(Method.class.getDeclaredMethod("copy"), true);
-            }
-        } catch (NoSuchMethodException | IllegalAccessException | ClassNotFoundException | NoSuchFieldException e) {
+
+            overrideField = forceAccessible(getField(AccessibleObject.class, "override"), true);
+
+
+            copyMethodMethod = forceAccessible(Method.class.getDeclaredMethod("copy"), true);
+
+
+            findLoadedClass0Method = forceAccessible(getMethod(ClassLoader.class, "findLoadedClass0", String.class), true);
+
+        } catch (NoSuchMethodException | IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
         }
     }

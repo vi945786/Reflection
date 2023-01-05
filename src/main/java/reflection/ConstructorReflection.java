@@ -10,6 +10,20 @@ import static reflection.Vars.*;
 public class ConstructorReflection {
 
     /**
+     * creates an instance of a class using the default constructor (even when the default constructor does not exist)
+     * @param clazz the class to make an instance of
+     * @return an instance of the class
+     */
+    public static <T> T createInstanceWithoutConstructor(Class<T> clazz) {
+        try {
+            return (T) unsafe.allocateInstance(clazz);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * makes a new instance of the constructor passed in
      * @param c constructor to create new instance of
      * @param args the arguments to make a new instance with
@@ -18,17 +32,14 @@ public class ConstructorReflection {
     public static <T> T useConstructor(Constructor<T> c, Object ... args) {
         try {
             if(args.length == c.getParameterCount()) {
-                boolean isOverride = overrideField.getBoolean(c);
+                boolean isOverride = isAccessible(c);
 
-                if(!isOverride) {
-                    forceAccessible(c, true);
-                }
+                forceAccessible(c, true);
 
                 T instance = c.newInstance(args);
 
-                if(!isOverride) {
-                    forceAccessible(c, false);
-                }
+                forceAccessible(c, isOverride);
+
                 return instance;
             }
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {

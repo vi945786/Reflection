@@ -13,7 +13,7 @@ public class SetModifierTest {
 
     @Test
     public void setModifierFinal() {
-        Field f = getField(TestVar.class, "wasMethodUsed", false);
+        Field f = getField(TestVar.class, "wasMethodUsed");
         assertFalse(Modifier.isFinal(f.getModifiers()));
         changeModifiers(f, Modifier.FINAL);
         assertTrue(Modifier.isFinal(f.getModifiers()));
@@ -21,7 +21,7 @@ public class SetModifierTest {
 
     @Test
     public void setModifierVolatileStrict() {
-        Field f = getField(TestVar.class, "wasMethodUsed", false);
+        Field f = getField(TestVar.class, "wasMethodUsed");
         assertFalse(Modifier.isVolatile(f.getModifiers()) && Modifier.isStrict(f.getModifiers()));
         changeModifiers(f, Modifier.VOLATILE, Modifier.STRICT);
         assertTrue(Modifier.isVolatile(f.getModifiers()) && Modifier.isStrict(f.getModifiers()));
@@ -30,7 +30,7 @@ public class SetModifierTest {
 
     @Test
     public void setModifierNotFinalStrict() {
-        Field f = getField(TestVar.class, "wasMethodUsed", false);
+        Field f = getField(TestVar.class, "wasMethodUsed");
         assertFalse(Modifier.isFinal(f.getModifiers()));
         changeModifiers(f, Modifier.FINAL);
         assertFalse(!Modifier.isFinal(f.getModifiers()) && Modifier.isStrict(f.getModifiers()));
@@ -39,7 +39,7 @@ public class SetModifierTest {
     }
     @Test
     public void setModifierNotPublic() {
-        Field f = getField(TestVar.class, "wasMethodUsed", false);
+        Field f = getField(TestVar.class, "wasMethodUsed");
         assertTrue(Modifier.isPublic(f.getModifiers()));
         changeModifiers(f, ~Modifier.PUBLIC);
         assertFalse(Modifier.isPublic(f.getModifiers()));

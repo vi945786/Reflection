@@ -10,12 +10,12 @@ public class ClassTest {
 
     @Test
     public void getTestVar() {
-        assertNotNull(getClassByName("vars", "TestVar"));
+        assertNotNull(getClassByName("vars.TestVar"));
     }
 
     @Test
     public void getInner() {
-        assertNotNull(getInnerClasses(getClassByName("vars", "TestVar")));
+        assertNotNull(getInnerClasses(getClassByName("vars.TestVar")));
     }
 
     @Test

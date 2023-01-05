@@ -14,40 +14,40 @@ public class MethodTest {
     @Test
     public void getPrivateMethodWithout() {
         TestVar testVar = new TestVar("");
-        useMethod(getMethod(TestVar.class, "privateMethod", false), testVar);
+        useMethod(getMethod(TestVar.class, "privateMethod"), testVar);
         assertTrue(testVar.wasMethodUsed);
     }
 
     @Test
     public void getPrivateMethodWith() {
         TestVar testVar = new TestVar("");
-        useMethod(getMethod(TestVar.class, "privateMethod", false, int.class), testVar, 1);
+        useMethod(getMethod(TestVar.class, "privateMethod", int.class), testVar, 1);
         assertTrue(testVar.wasMethodUsed);
     }
 
     @Test
     public void getPrivateStaticMethodWithout() {
-        useMethod(getMethod(TestVar.class, "privateStaticMethod", false), null);
+        useMethod(getMethod(TestVar.class, "privateStaticMethod"), null);
         assertTrue(TestVar.wasStaticMethodUsed);
     }
 
     @Test
     public void getPrivateStaticMethodWith() {
-        useMethod(getMethod(TestVar.class, "privateStaticMethod", false, int.class), null, 1);
+        useMethod(getMethod(TestVar.class, "privateStaticMethod", int.class), null, 1);
         assertTrue(TestVar.wasStaticMethodUsedWith);
     }
 
     @Test
     public void getPrivateMethodWithoutSuperclass() {
         TestVar2 fakeClass2 = new TestVar2();
-        useMethod(getMethod(TestVar.class, "privateMethod", false), fakeClass2);
+        useMethod(getMethod(TestVar.class, "privateMethod"), fakeClass2);
         assertTrue(fakeClass2.wasMethodUsed);
     }
 
     @Test
     public void getPrivateMethodWithSuperclass() {
         TestVar2 fakeClass2 = new TestVar2();
-        useMethod(getMethod(TestVar.class, "privateMethod", false, int.class), fakeClass2, 1);
+        useMethod(getMethod(TestVar.class, "privateMethod", int.class), fakeClass2, 1);
         assertTrue(fakeClass2.wasMethodUsed);
     }
 
@@ -65,19 +65,10 @@ public class MethodTest {
 
     @Test
     public void getUnusable() {
-        if(Vars.javaVersion < 9) {
-            try {
-                assertEquals(getFieldValue(Class.forName("jdk.internal.org.objectweb.asm.Type").getField("BYTE_TYPE"), null), useMethod(Class.forName("jdk.internal.org.objectweb.asm.Type").getDeclaredMethod("getType", String.class), null, "B"));
-            } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException e) {
-                e.printStackTrace();
-            }
-
-        } else {
-            Object o = getFieldValue(getField(Vars.unsafeClass, "theInternalUnsafe", false), null);
-            Field f = getField(TestVar.class, "publicFinalField", false);
-            Method m = getMethod(o.getClass(), "objectFieldOffset0", false, Field.class);
-            assertDoesNotThrow(() -> useMethod(m, o, f));
-            assertNotNull(useMethod(m, o, f));
+        try {
+            assertEquals(getFieldValue(Class.forName("jdk.internal.org.objectweb.asm.Type").getField("BYTE_TYPE"), null), useMethod(Class.forName("jdk.internal.org.objectweb.asm.Type").getDeclaredMethod("getType", String.class), null, "B"));
+        } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException e) {
+            e.printStackTrace();
         }
     }
 }
